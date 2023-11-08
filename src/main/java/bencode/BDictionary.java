@@ -1,110 +1,95 @@
-package com.ren130302.bencode;
+package bencode;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-
-import com.google.common.collect.Maps;
-
+import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "create")
-public final class BDictionary implements BValue {
+public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 
 	private static final long serialVersionUID = -7574359365654348201L;
-	private final @NonNull Map<String, BValue> map;
+	private final @NonNull Map<String, BValue<?>> value;
 
 	@Override
 	public BDictionary clone() {
 		try {
 			return (BDictionary) super.clone();
 		} catch (CloneNotSupportedException cnse) {
-			final BDictionary result = create(this.getMap());
+			final BDictionary result = create(new HashMap<>(this.value));
 
 			return result;
 		}
 	}
 
-	public static final Pattern PATTERN = Pattern.compile("(?s)(?m)^d(?<entries>.*)e$");
-
-	public static BDictionary newBDictionary() {
-		return create(Maps.newHashMap());
-	}
-
 	public int size() {
-		return this.getMap().size();
+		return this.value.size();
 	}
 
 	public boolean isEmpty() {
-		return this.getMap().isEmpty();
+		return this.value.isEmpty();
 	}
 
 	public boolean containsKey(Object key) {
-		return this.getMap().containsKey(key);
+		return this.value.containsKey(key);
 	}
 
 	public boolean containsValue(Object value) {
-		return this.getMap().containsValue(value);
+		return this.value.containsValue(value);
 	}
 
-	public BValue get(Object key) {
-		return this.getMap().get(key);
+	public BValue<?> get(Object key) {
+		return this.value.get(key);
 	}
 
-	public BValue put(String key, BValue value) {
-		return this.getMap().put(key, value);
+	public BValue<?> put(String key, BValue<?> value) {
+		return this.value.put(key, value);
 	}
 
-	public BValue remove(Object key) {
-		return this.getMap().remove(key);
+	public BValue<?> remove(Object key) {
+		return this.value.remove(key);
 	}
 
-	public void putAll(Map<? extends String, ? extends BValue> m) {
-		this.getMap().putAll(m);
+	public void putAll(Map<? extends String, ? extends BValue<?>> m) {
+		this.value.putAll(m);
 	}
 
 	public void clear() {
-		this.getMap().clear();
+		this.value.clear();
 	}
 
 	public Set<String> keySet() {
-		return this.getMap().keySet();
+		return this.value.keySet();
 	}
 
-	public Collection<BValue> values() {
-		return this.getMap().values();
+	public Collection<BValue<?>> values() {
+		return this.value.values();
 	}
 
-	public Set<Entry<String, BValue>> entrySet() {
-		return this.getMap().entrySet();
+	public Set<Entry<String, BValue<?>>> entrySet() {
+		return this.value.entrySet();
 	}
 
-	public void putIfPresent(String key, @Nullable BValue value) {
+	public void putIfPresent(String key, BValue<?> value) {
 		Optional.of(value).ifPresent(v -> this.put(key, v));
 	}
 
-	public <T extends BValue, V> V getDef(Optional<T> optional, V defaultValue, Function<T, V> func) {
+	public <T extends BValue<?>, V> V getDef(Optional<T> optional, V defaultValue, Function<T, V> func) {
 		return optional.isPresent() ? func.apply(optional.get()) : defaultValue;
 	}
 
-	public <T extends BValue> Optional<T> getOptionalBValue(String key, Function<BValue, T> castFunc) {
+	public <T extends BValue<?>> Optional<T> getOptionalBValue(String key, Function<BValue<?>, T> castFunc) {
 		return Optional.ofNullable(castFunc.apply(this.get(key)));
 	}
 
@@ -114,12 +99,12 @@ public final class BDictionary implements BValue {
 		return this.getOptionalBValue(key, BDictionary.class::cast);
 	}
 
-	public @Nullable BDictionary getBDictionary(String key) {
+	public BDictionary getBDictionary(String key) {
 		return this.getOptionalBDictionary(key).get();
 	}
 
-	public @Nullable Map<String, BValue> getDictionary(String key) {
-		return this.getBDictionary(key).getMap();
+	public Map<String, BValue<?>> getDictionary(String key) {
+		return this.getBDictionary(key).getValue();
 	}
 
 	/* string */
@@ -128,12 +113,12 @@ public final class BDictionary implements BValue {
 		return this.getOptionalBValue(key, BString.class::cast);
 	}
 
-	public @Nullable BString getBString(String key) {
+	public BString getBString(String key) {
 		return this.getOptionalBString(key).get();
 	}
 
-	public byte[] getBytes(String key) {
-		return this.getBString(key).getBytes();
+	public Byte[] getBytes(String key) {
+		return this.getBString(key).getValue();
 	}
 
 	public String getString(String key) {
@@ -170,7 +155,7 @@ public final class BDictionary implements BValue {
 		return this.getOptionalBValue(key, BList.class::cast);
 	}
 
-	public @Nullable BList getBList(String key) {
+	public BList getBList(String key) {
 		return this.getOptionalBList(key).get();
 	}
 
@@ -180,7 +165,7 @@ public final class BDictionary implements BValue {
 		return this.getOptionalBValue(key, BInteger.class::cast);
 	}
 
-	public @Nullable BInteger getBInteger(String key) {
+	public BInteger getBInteger(String key) {
 		return this.getOptionalBInteger(key).get();
 	}
 
@@ -240,12 +225,12 @@ public final class BDictionary implements BValue {
 		this.putIfPresent(key, BInteger.valueOf(value));
 	}
 
-	public void forEach(BiConsumer<BString, BValue> action) {
+	public void forEach(BiConsumer<BString, BValue<?>> action) {
 		Objects.requireNonNull(action);
-		for (Map.Entry<String, BValue> entry : this.getMap().entrySet().stream().sorted(Entry.comparingByKey())
+		for (Entry<String, BValue<?>> entry : this.value.entrySet().stream().sorted(Entry.comparingByKey())
 				.collect(Collectors.toSet())) {
 			BString k;
-			BValue v;
+			BValue<?> v;
 			try {
 				k = BString.valueOf(entry.getKey());
 				v = entry.getValue();
@@ -257,86 +242,20 @@ public final class BDictionary implements BValue {
 		}
 	}
 
-	public static String print(final @Nonnull BDictionary value) {
+	@Override
+	public String toString() {
 		final StringBuffer buffer = new StringBuffer();
-		final StringBuffer entries = new StringBuffer();
-
-		value.forEach((k, v) -> {
-			entries.append(BValue.print(k).replace(System.lineSeparator(), System.lineSeparator() + "\t"))
-					.append(System.lineSeparator());
-			entries.append(BValue.print(v).replace(System.lineSeparator(), System.lineSeparator() + "\t"))
-					.append(System.lineSeparator());
-			entries.append(System.lineSeparator());
-		});
-
-		return buffer.append("'dictionary':").append('{').append(System.lineSeparator()).append(entries).append('}')
-				.toString();
-	}
-
-	public static String writeToString(final @Nonnull BDictionary value) {
-		final StringBuffer buffer = new StringBuffer();
-
-		buffer.append(BValue.DICTIONARY);
-
-		value.forEach((k, v) -> {
-			BValue.writeToString(k);
-			BValue.writeToString(v);
-		});
-
-		buffer.append(BValue.END);
-
+		buffer.append('{');
+		buffer.append(String.join(", ",
+				this.getValue().entrySet().stream()
+						.map(entry -> BString.valueOf(entry.getKey()).toString() + ":" + entry.getValue().toString())
+						.toList()));
+		buffer.append('}');
 		return buffer.toString();
 	}
 
-	public static byte[] writeToBytes(final @Nonnull BDictionary value) {
-		return writeToString(value).getBytes();
-	}
-
-	public static ByteBuffer writeToByteBuffer(final @Nonnull BDictionary value) {
-		return ByteBuffer.wrap(writeToBytes(value));
-	}
-
-	public static BDictionary readFromByteBuffer(final @Nonnull ByteBuffer data) throws IOException {
-		return readFromByteBuffer(data, new AtomicInteger());
-	}
-
-	public static BDictionary readFromByteBuffer(final @Nonnull ByteBuffer byteBuffer,
-			final @Nonnull AtomicInteger indicator) throws IOException {
-		int c = BValueUtils.getNextIndicator(byteBuffer, indicator);
-
-		if (c != DICTIONARY) {
-			throw new IllegalArgumentException("Expected 'd', not '" + (char) c + "'");
-		}
-
-		indicator.set(0);
-
-		final Map<String, BValue> map = Maps.newHashMap();
-
-		BString key = null;
-		BValue value = null;
-		c = BValueUtils.getNextIndicator(byteBuffer, indicator);
-
-		while (c != END) {
-			key = BString.readFromByteBuffer(byteBuffer, indicator);
-			value = BValue.readFromByteBuffer(byteBuffer, indicator);
-
-			map.put(key.getString(), value);
-
-			c = BValueUtils.getNextIndicator(byteBuffer, indicator);
-		}
-
-		indicator.set(0);
-
-		final BDictionary result = BDictionary.create(map);
-
-		return result;
-	}
-
-	public static BDictionary readFromBytes(final @Nonnull byte[] array) throws IOException {
-		return readFromByteBuffer(ByteBuffer.wrap(array));
-	}
-
-	public static BDictionary readFromString(final @Nonnull String data) throws IOException {
-		return readFromBytes(data.getBytes());
+	@Override
+	public BValueType getType() {
+		return BValueType.BDICTIONARY;
 	}
 }
