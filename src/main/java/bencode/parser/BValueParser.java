@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
-import javax.annotation.Nonnull;
-
 import bencode.BValue;
 import lombok.NonNull;
 
@@ -15,21 +13,21 @@ public interface BValueParser<T extends BValue<?>> {
 
 	ByteBuffer writeToByteBuffer(@NonNull T value) throws IOException;
 
-	default String writeToString(@Nonnull T value) throws IOException {
+	default String writeToString(@NonNull T value) throws IOException {
 		return new String(this.writeToBytes(value), this.getCharset());
 	}
 
-	default byte[] writeToBytes(@Nonnull T value) throws IOException {
+	default byte[] writeToBytes(@NonNull T value) throws IOException {
 		return this.writeToByteBuffer(value).array();
 	}
 
 	T readFromByteBuffer(@NonNull ByteBuffer data) throws IOException;
 
-	default T readFromBytes(@Nonnull byte[] data) throws IOException {
+	default T readFromBytes(@NonNull byte[] data) throws IOException {
 		return this.readFromByteBuffer(ByteBuffer.wrap(data));
 	}
 
-	default T readFromString(@Nonnull String data) throws IOException {
+	default T readFromString(@NonNull String data) throws IOException {
 		return this.readFromBytes(data.getBytes(this.getCharset()));
 	}
 

@@ -78,13 +78,13 @@ public final class BString implements BValue<Byte[]> {
 		final boolean hasNegativeValue = list.stream().anyMatch(v -> v < 0);
 
 		if (hasNegativeValue) {
-			bytes.append('(');
+			bytes.append('[');
 			bytes.append(String.join(", ", list.stream().map(v -> Byte.toString(v)).toList()));
-			bytes.append(')');
+			bytes.append(']');
 		} else {
-			bytes.append('\'');
+			bytes.append('\"');
 			bytes.append(this.getString());
-			bytes.append('\'');
+			bytes.append('\"');
 		}
 
 		return buffer.append(bytes).toString();
