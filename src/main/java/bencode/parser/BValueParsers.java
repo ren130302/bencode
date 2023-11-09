@@ -45,8 +45,7 @@ public final class BValueParsers implements BValueParser<BValue<?>> {
 	public BValue<?> readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
 		byteBuffer.mark();
 		int indicator = BValueParser.get(byteBuffer);
-
-		if (BValueCharacter.ZERO <= indicator && indicator <= BValueCharacter.NINE) {
+		if (Character.isDigit(indicator)) {
 			return new BStringParser(this.getCharset()).readFromByteBuffer(byteBuffer.reset());
 		}
 		switch (indicator) {

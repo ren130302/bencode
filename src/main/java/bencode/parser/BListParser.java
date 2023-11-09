@@ -17,7 +17,7 @@ import lombok.Value;
 @Value
 public class BListParser implements BValueParser<BList> {
 
-	public static final Pattern PATTERN = Pattern.compile("(?s)(?m)^l(?<items>.*)e$");
+	public static final Pattern PATTERN = Pattern.compile("(?sm)^l(?<items>.*)e$");
 
 	private final Charset charset;
 
@@ -53,6 +53,10 @@ public class BListParser implements BValueParser<BList> {
 		c = BValueParser.get(byteBuffer, byteBuffer.position());
 
 		while (c != BValueCharacter.END) {
+			if (!byteBuffer.hasRemaining()) {
+				throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
+			}
+
 			value = new BValueParsers(this.getCharset()).readFromByteBuffer(byteBuffer);
 			list.add(value);
 			c = BValueParser.get(byteBuffer, byteBuffer.position());

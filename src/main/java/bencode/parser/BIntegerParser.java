@@ -15,7 +15,7 @@ import lombok.Value;
 @Value
 public final class BIntegerParser implements BValueParser<BInteger> {
 
-	public static final Pattern PATTERN = Pattern.compile("(?s)(?m)^i(?<number>\\d+)e$");
+	public static final Pattern PATTERN = Pattern.compile("(?sm)^i(?<number>\\d+)e$");
 
 	private final Charset charset;
 
@@ -54,9 +54,8 @@ public final class BIntegerParser implements BValueParser<BInteger> {
 		}
 		int to = byteBuffer.position() - 1;
 		int number = Integer.parseInt(new String(this.slice(byteBuffer, from, to), this.getCharset()));
-		final BInteger result = BInteger.valueOf(number);
 
-		return result;
+		return BInteger.valueOf(number);
 	}
 
 	private byte[] slice(ByteBuffer byteBuffer, int from, int to) {

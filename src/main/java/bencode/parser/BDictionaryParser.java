@@ -19,7 +19,7 @@ import lombok.Value;
 @Value
 public final class BDictionaryParser implements BValueParser<BDictionary> {
 
-	public static final Pattern PATTERN = Pattern.compile("(?s)(?m)^d(?<entries>.*)e$");
+	public static final Pattern PATTERN = Pattern.compile("(?sm)^d(?<entries>.*)e$");
 
 	private final Charset charset;
 
@@ -59,6 +59,10 @@ public final class BDictionaryParser implements BValueParser<BDictionary> {
 		c = BValueParser.get(byteBuffer, byteBuffer.position());
 
 		while (c != BValueCharacter.END) {
+			if (!byteBuffer.hasRemaining()) {
+				throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
+			}
+
 			key = new BStringParser(this.getCharset()).readFromByteBuffer(byteBuffer);
 			value = new BValueParsers(this.getCharset()).readFromByteBuffer(byteBuffer);
 
@@ -67,9 +71,7 @@ public final class BDictionaryParser implements BValueParser<BDictionary> {
 			c = BValueParser.get(byteBuffer, byteBuffer.position());
 		}
 
-		final BDictionary result = BDictionary.create(map);
-
-		return result;
+		return BDictionary.create(map);
 	}
 
 }

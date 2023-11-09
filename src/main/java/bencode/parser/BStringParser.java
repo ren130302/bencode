@@ -15,7 +15,7 @@ import lombok.Value;
 @Value
 public final class BStringParser implements BValueParser<BString> {
 
-	public static final Pattern PATTERN = Pattern.compile("(?s)(?m)^(?<length>\\d+):(?<text>.*)$");
+	public static final Pattern PATTERN = Pattern.compile("(?sm)^(?<length>\\d+):(?<text>.*)$");
 
 	private final Charset charset;
 
@@ -42,7 +42,7 @@ public final class BStringParser implements BValueParser<BString> {
 
 		while (c != BValueCharacter.CORON) {
 			if (!byteBuffer.hasRemaining()) {
-				throw new IllegalArgumentException("Colon expected, not '" + (char) c + "'");
+				throw new IllegalArgumentException("Expected ':', not '" + (char) c + "'");
 			}
 			c = BValueParser.get(byteBuffer);
 		}
@@ -50,7 +50,7 @@ public final class BStringParser implements BValueParser<BString> {
 		int length = Integer.parseInt(new String(this.slice(byteBuffer, from, to), this.getCharset()));
 
 		if (length < 0) {
-			throw new IllegalArgumentException("Length expected, " + length + "");
+			throw new IllegalArgumentException("Expected negetive value, " + length + "");
 		}
 
 		from = byteBuffer.position();
@@ -62,9 +62,7 @@ public final class BStringParser implements BValueParser<BString> {
 
 		byteBuffer.position(to);
 
-		final BString result = BString.valueOf(this.slice(byteBuffer, from, to));
-
-		return result;
+		return BString.valueOf(this.slice(byteBuffer, from, to));
 	}
 
 	private byte[] slice(ByteBuffer byteBuffer, int from, int to) {

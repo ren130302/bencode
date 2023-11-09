@@ -50,6 +50,10 @@ public class ParseTest {
 		this.assertBValue(bString);
 		this.assertBString(bString);
 
+		BString bStringEmpty = BString.valueOf("");
+		this.assertBValue(bStringEmpty);
+		this.assertBString(bStringEmpty);
+
 		BInteger bInteger = BInteger.valueOf(100);
 		this.assertBValue(bInteger);
 		this.assertBInteger(bInteger);
