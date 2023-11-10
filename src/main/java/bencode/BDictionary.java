@@ -3,15 +3,14 @@ package bencode;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import lombok.NonNull;
 import lombok.Value;
@@ -27,7 +26,7 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 		try {
 			return (BDictionary) super.clone();
 		} catch (CloneNotSupportedException cnse) {
-			final BDictionary result = create(new HashMap<>(this.value));
+			final BDictionary result = create(new TreeMap<>(this.value));
 
 			return result;
 		}
@@ -79,6 +78,16 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 
 	public Set<Entry<String, BValue<?>>> entrySet() {
 		return this.value.entrySet();
+	}
+
+	public Set<Entry<BString, BValue<?>>> entrySetConverted() {
+		final Map<BString, BValue<?>> result = new TreeMap<>();
+
+		for (Entry<String, BValue<?>> entry : this.value.entrySet()) {
+			result.put(BString.valueOf(entry.getKey()), entry.getValue());
+		}
+
+		return result.entrySet();
 	}
 
 	public void putIfPresent(String key, BValue<?> value) {
@@ -227,8 +236,7 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 
 	public void forEach(BiConsumer<BString, BValue<?>> action) {
 		Objects.requireNonNull(action);
-		for (Entry<String, BValue<?>> entry : this.value.entrySet().stream().sorted(Entry.comparingByKey())
-				.collect(Collectors.toSet())) {
+		for (Entry<String, BValue<?>> entry : this.entrySet()) {
 			BString k;
 			BValue<?> v;
 			try {

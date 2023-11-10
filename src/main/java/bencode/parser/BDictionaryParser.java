@@ -3,9 +3,9 @@ package bencode.parser;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import bencode.BDictionary;
@@ -51,7 +51,7 @@ public final class BDictionaryParser implements BValueParser<BDictionary> {
 			throw new IllegalArgumentException("Expected 'd', not '" + (char) c + "'");
 		}
 
-		final Map<String, BValue<?>> map = new HashMap<>();
+		final Map<String, BValue<?>> map = new TreeMap<>();
 
 		BString key = null;
 		BValue<?> value = null;
