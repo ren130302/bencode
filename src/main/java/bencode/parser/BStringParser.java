@@ -49,7 +49,7 @@ public final class BStringParser implements IBValueParser<BString> {
 		int length = Integer.parseInt(new String(this.slice(byteBuffer, from, to), this.getCharset()));
 
 		if (length < 0) {
-			throw new IllegalArgumentException("Expected negetive value, " + length + "");
+			throw new IllegalArgumentException("Expected negetive value, not " + length + "");
 		}
 
 		from = byteBuffer.position();

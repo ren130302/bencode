@@ -47,7 +47,7 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 
 		while (c != END) {
 			if (!byteBuffer.hasRemaining()) {
-				throw new IllegalArgumentException("E expected, not '" + (char) c + "'");
+				throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
 			}
 			c = IBValueParser.get(byteBuffer);
 		}
