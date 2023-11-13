@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import bencode.BList;
-import bencode.BValue;
+import bencode.IBValue;
 import bencode.BValueCharacter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 @RequiredArgsConstructor
 @Value
-public class BListParser implements BValueParser<BList> {
+public class BListParser implements IBValueParser<BList> {
 
 	public static final Pattern PATTERN = Pattern.compile("(?sm)^l(?<items>.*)e$");
 
@@ -30,8 +30,8 @@ public class BListParser implements BValueParser<BList> {
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(BValueCharacter.LIST);
 
-		for (BValue<?> v : value.getValue()) {
-			buffer.append(new BValueParsers(this.getCharset()).writeToString(v));
+		for (IBValue<?> v : value.getValue()) {
+			buffer.append(new BValueParser(this.getCharset()).writeToString(v));
 		}
 
 		buffer.append(BValueCharacter.END);
@@ -41,25 +41,25 @@ public class BListParser implements BValueParser<BList> {
 
 	@Override
 	public BList readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
-		int c = BValueParser.get(byteBuffer);
+		int c = IBValueParser.get(byteBuffer);
 
 		if (c != BValueCharacter.LIST) {
 			throw new IllegalArgumentException("Expected 'l', not '" + (char) c + "'");
 		}
 
-		final List<BValue<?>> list = new ArrayList<>();
+		final List<IBValue<?>> list = new ArrayList<>();
 
-		BValue<?> value = null;
-		c = BValueParser.get(byteBuffer, byteBuffer.position());
+		IBValue<?> value = null;
+		c = IBValueParser.get(byteBuffer, byteBuffer.position());
 
 		while (c != BValueCharacter.END) {
 			if (!byteBuffer.hasRemaining()) {
 				throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
 			}
 
-			value = new BValueParsers(this.getCharset()).readFromByteBuffer(byteBuffer);
+			value = new BValueParser(this.getCharset()).readFromByteBuffer(byteBuffer);
 			list.add(value);
-			c = BValueParser.get(byteBuffer, byteBuffer.position());
+			c = IBValueParser.get(byteBuffer, byteBuffer.position());
 		}
 
 		final BList result = BList.create(list);

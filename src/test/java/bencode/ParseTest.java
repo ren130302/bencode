@@ -14,14 +14,14 @@ import bencode.parser.BDictionaryParser;
 import bencode.parser.BIntegerParser;
 import bencode.parser.BListParser;
 import bencode.parser.BStringParser;
-import bencode.parser.BValueParsers;
+import bencode.parser.BValueParser;
 
 //@Log
 public class ParseTest {
 
 	@Test
 	public void test() throws IOException {
-		final BValueParsers valueParsers = new BValueParsers(StandardCharsets.UTF_8);
+		final BValueParser valueParsers = new BValueParser(StandardCharsets.UTF_8);
 
 		try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("bittorrent-v2-test.torrent")) {
@@ -75,13 +75,13 @@ public class ParseTest {
 		this.assertBDictionary(bDict);
 	}
 
-	private void assertBValue(BValue<?> bValue) throws IOException {
-		final BValueParsers valueParsers = new BValueParsers(StandardCharsets.UTF_8);
+	private void assertBValue(IBValue<?> bValue) throws IOException {
+		final BValueParser valueParsers = new BValueParser(StandardCharsets.UTF_8);
 
 		String serialized = valueParsers.writeToString(bValue);
 		System.out.println(serialized);
 
-		BValue<?> desirialized = valueParsers.readFromString(serialized);
+		IBValue<?> desirialized = valueParsers.readFromString(serialized);
 		System.out.println(desirialized);
 
 		Assertions.assertEquals(bValue, desirialized);

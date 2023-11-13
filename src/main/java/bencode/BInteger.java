@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "valueOf")
-public final class BInteger implements BValue<Long>, Comparable<BInteger> {
+public final class BInteger implements IBValue<Long>, Comparable<BInteger> {
 
 	private static final long serialVersionUID = 4188918941802769935L;
 	private final @NonNull Long value;

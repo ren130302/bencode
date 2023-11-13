@@ -4,38 +4,60 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
-import bencode.BValue;
-import lombok.NonNull;
+import bencode.BDictionary;
+import bencode.BInteger;
+import bencode.BList;
+import bencode.BString;
+import bencode.IBValue;
+import bencode.BValueCharacter;
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
 
-public interface BValueParser<T extends BValue<?>> {
+@RequiredArgsConstructor
+@Value
+public final class BValueParser implements IBValueParser<IBValue<?>> {
 
-	Charset getCharset();
+	private final Charset charset;
 
-	ByteBuffer writeToByteBuffer(@NonNull T value) throws IOException;
-
-	default String writeToString(@NonNull T value) throws IOException {
-		return new String(this.writeToBytes(value), this.getCharset());
+	public BValueParser() {
+		this(Charset.defaultCharset());
 	}
 
-	default byte[] writeToBytes(@NonNull T value) throws IOException {
-		return this.writeToByteBuffer(value).array();
+	@Override
+	public ByteBuffer writeToByteBuffer(IBValue<?> value) throws IOException {
+		if (value instanceof BString v) {
+			return new BStringParser(this.getCharset()).writeToByteBuffer(v);
+		}
+		if (value instanceof BInteger v) {
+			return new BIntegerParser(this.getCharset()).writeToByteBuffer(v);
+		}
+		if (value instanceof BList v) {
+			return new BListParser(this.getCharset()).writeToByteBuffer(v);
+		}
+		if (value instanceof BDictionary v) {
+			return new BDictionaryParser(this.getCharset()).writeToByteBuffer(v);
+		}
+
+		throw new IOException("" + value.getClass().getSimpleName());
 	}
 
-	T readFromByteBuffer(@NonNull ByteBuffer data) throws IOException;
+	@Override
+	public IBValue<?> readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
+		byteBuffer.mark();
+		int indicator = IBValueParser.get(byteBuffer);
+		if (Character.isDigit(indicator)) {
+			return new BStringParser(this.getCharset()).readFromByteBuffer(byteBuffer.reset());
+		}
+		switch (indicator) {
+		case BValueCharacter.INTEGER:
+			return new BIntegerParser(this.getCharset()).readFromByteBuffer(byteBuffer.reset());
+		case BValueCharacter.LIST:
+			return new BListParser(this.getCharset()).readFromByteBuffer(byteBuffer.reset());
+		case BValueCharacter.DICTIONARY:
+			return new BDictionaryParser(this.getCharset()).readFromByteBuffer(byteBuffer.reset());
+		}
 
-	default T readFromBytes(@NonNull byte[] data) throws IOException {
-		return this.readFromByteBuffer(ByteBuffer.wrap(data));
+		throw new IOException("" + (char) indicator);
 	}
 
-	default T readFromString(@NonNull String data) throws IOException {
-		return this.readFromBytes(data.getBytes(this.getCharset()));
-	}
-
-	static int get(ByteBuffer byteBuffer, int index) {
-		return Byte.toUnsignedInt(byteBuffer.get(index));
-	}
-
-	static int get(ByteBuffer byteBuffer) {
-		return Byte.toUnsignedInt(byteBuffer.get());
-	}
 }

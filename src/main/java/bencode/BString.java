@@ -10,7 +10,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "valueOf")
-public final class BString implements BValue<Byte[]>, Comparable<BString> {
+public final class BString implements IBValue<Byte[]>, Comparable<BString> {
 
 	private static final long serialVersionUID = 2812347755822710497L;
 	private final @NonNull Byte[] value;

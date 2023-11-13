@@ -16,10 +16,10 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "create")
-public final class BDictionary implements BValue<Map<String, BValue<?>>> {
+public final class BDictionary implements IBValue<Map<String, IBValue<?>>> {
 
 	private static final long serialVersionUID = -7574359365654348201L;
-	private final @NonNull Map<String, BValue<?>> value;
+	private final @NonNull Map<String, IBValue<?>> value;
 
 	@Override
 	public BDictionary clone() {
@@ -48,19 +48,19 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 		return this.value.containsValue(value);
 	}
 
-	public BValue<?> get(Object key) {
+	public IBValue<?> get(Object key) {
 		return this.value.get(key);
 	}
 
-	public BValue<?> put(String key, BValue<?> value) {
+	public IBValue<?> put(String key, IBValue<?> value) {
 		return this.value.put(key, value);
 	}
 
-	public BValue<?> remove(Object key) {
+	public IBValue<?> remove(Object key) {
 		return this.value.remove(key);
 	}
 
-	public void putAll(Map<? extends String, ? extends BValue<?>> m) {
+	public void putAll(Map<? extends String, ? extends IBValue<?>> m) {
 		this.value.putAll(m);
 	}
 
@@ -72,33 +72,33 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 		return this.value.keySet();
 	}
 
-	public Collection<BValue<?>> values() {
+	public Collection<IBValue<?>> values() {
 		return this.value.values();
 	}
 
-	public Set<Entry<String, BValue<?>>> entrySet() {
+	public Set<Entry<String, IBValue<?>>> entrySet() {
 		return this.value.entrySet();
 	}
 
-	public Set<Entry<BString, BValue<?>>> entrySetConverted() {
-		final Map<BString, BValue<?>> result = new TreeMap<>();
+	public Set<Entry<BString, IBValue<?>>> entrySetConverted() {
+		final Map<BString, IBValue<?>> result = new TreeMap<>();
 
-		for (Entry<String, BValue<?>> entry : this.value.entrySet()) {
+		for (Entry<String, IBValue<?>> entry : this.value.entrySet()) {
 			result.put(BString.valueOf(entry.getKey()), entry.getValue());
 		}
 
 		return result.entrySet();
 	}
 
-	public void putIfPresent(String key, BValue<?> value) {
+	public void putIfPresent(String key, IBValue<?> value) {
 		Optional.of(value).ifPresent(v -> this.put(key, v));
 	}
 
-	public <T extends BValue<?>, V> V getDef(Optional<T> optional, V defaultValue, Function<T, V> func) {
+	public <T extends IBValue<?>, V> V getDef(Optional<T> optional, V defaultValue, Function<T, V> func) {
 		return optional.isPresent() ? func.apply(optional.get()) : defaultValue;
 	}
 
-	public <T extends BValue<?>> Optional<T> getOptionalBValue(String key, Function<BValue<?>, T> castFunc) {
+	public <T extends IBValue<?>> Optional<T> getOptionalBValue(String key, Function<IBValue<?>, T> castFunc) {
 		return Optional.ofNullable(castFunc.apply(this.get(key)));
 	}
 
@@ -112,7 +112,7 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 		return this.getOptionalBDictionary(key).get();
 	}
 
-	public Map<String, BValue<?>> getDictionary(String key) {
+	public Map<String, IBValue<?>> getDictionary(String key) {
 		return this.getBDictionary(key).getValue();
 	}
 
@@ -234,11 +234,11 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 		this.putIfPresent(key, BInteger.valueOf(value));
 	}
 
-	public void forEach(BiConsumer<BString, BValue<?>> action) {
+	public void forEach(BiConsumer<BString, IBValue<?>> action) {
 		Objects.requireNonNull(action);
-		for (Entry<String, BValue<?>> entry : this.entrySet()) {
+		for (Entry<String, IBValue<?>> entry : this.entrySet()) {
 			BString k;
-			BValue<?> v;
+			IBValue<?> v;
 			try {
 				k = BString.valueOf(entry.getKey());
 				v = entry.getValue();

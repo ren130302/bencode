@@ -13,7 +13,7 @@ import lombok.Value;
 
 @RequiredArgsConstructor
 @Value
-public final class BIntegerParser implements BValueParser<BInteger> {
+public final class BIntegerParser implements IBValueParser<BInteger> {
 
 	public static final Pattern PATTERN = Pattern.compile("(?sm)^i(?<number>\\d+)e$");
 
@@ -36,7 +36,7 @@ public final class BIntegerParser implements BValueParser<BInteger> {
 
 	@Override
 	public BInteger readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
-		int c = BValueParser.get(byteBuffer);
+		int c = IBValueParser.get(byteBuffer);
 
 		if (c != BValueCharacter.INTEGER) {
 			throw new IllegalArgumentException("Expected 'i', not '" + (char) c + "'");
@@ -44,13 +44,13 @@ public final class BIntegerParser implements BValueParser<BInteger> {
 
 		int from = byteBuffer.position();
 
-		c = BValueParser.get(byteBuffer);
+		c = IBValueParser.get(byteBuffer);
 
 		while (c != BValueCharacter.END) {
 			if (!byteBuffer.hasRemaining()) {
 				throw new IllegalArgumentException("E expected, not '" + (char) c + "'");
 			}
-			c = BValueParser.get(byteBuffer);
+			c = IBValueParser.get(byteBuffer);
 		}
 		int to = byteBuffer.position() - 1;
 		int number = Integer.parseInt(new String(this.slice(byteBuffer, from, to), this.getCharset()));

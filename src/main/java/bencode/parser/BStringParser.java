@@ -13,7 +13,7 @@ import lombok.Value;
 
 @RequiredArgsConstructor
 @Value
-public final class BStringParser implements BValueParser<BString> {
+public final class BStringParser implements IBValueParser<BString> {
 
 	public static final Pattern PATTERN = Pattern.compile("(?sm)^(?<length>\\d+):(?<text>.*)$");
 
@@ -38,13 +38,13 @@ public final class BStringParser implements BValueParser<BString> {
 	public BString readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
 		int from = byteBuffer.position();
 
-		int c = BValueParser.get(byteBuffer);
+		int c = IBValueParser.get(byteBuffer);
 
 		while (c != BValueCharacter.CORON) {
 			if (!byteBuffer.hasRemaining()) {
 				throw new IllegalArgumentException("Expected ':', not '" + (char) c + "'");
 			}
-			c = BValueParser.get(byteBuffer);
+			c = IBValueParser.get(byteBuffer);
 		}
 		int to = byteBuffer.position() - 1;
 		int length = Integer.parseInt(new String(this.slice(byteBuffer, from, to), this.getCharset()));

@@ -2,7 +2,7 @@ package bencode;
 
 import java.io.Serializable;
 
-public interface BValue<T> extends Cloneable, Serializable {
+public interface IBValue<T> extends Cloneable, Serializable {
 
 	T getValue();
 
@@ -15,7 +15,7 @@ public interface BValue<T> extends Cloneable, Serializable {
 	@Override
 	int hashCode();
 
-	BValue<T> clone();
+	IBValue<T> clone();
 
 	BValueType getType();
 }
