@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 import bencode.BDictionary;
 import bencode.BString;
 import bencode.IBValue;
-import bencode.BValueCharacter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
@@ -31,14 +30,14 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 	public ByteBuffer writeToByteBuffer(BDictionary value) throws IOException {
 		final StringBuffer buffer = new StringBuffer();
 
-		buffer.append(BValueCharacter.DICTIONARY);
+		buffer.append(DICTIONARY);
 
 		for (Entry<String, IBValue<?>> entry : value.entrySet()) {
 			buffer.append(new BStringParser(this.getCharset()).writeToString(BString.valueOf(entry.getKey())));
 			buffer.append(new BValueParser(this.getCharset()).writeToString(entry.getValue()));
 		}
 
-		buffer.append(BValueCharacter.END);
+		buffer.append(END);
 
 		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
 	}
@@ -47,7 +46,7 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 	public BDictionary readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
 		int c = IBValueParser.get(byteBuffer);
 
-		if (c != BValueCharacter.DICTIONARY) {
+		if (c != DICTIONARY) {
 			throw new IllegalArgumentException("Expected 'd', not '" + (char) c + "'");
 		}
 
@@ -58,7 +57,7 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 
 		c = IBValueParser.get(byteBuffer, byteBuffer.position());
 
-		while (c != BValueCharacter.END) {
+		while (c != END) {
 			if (!byteBuffer.hasRemaining()) {
 				throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
 			}

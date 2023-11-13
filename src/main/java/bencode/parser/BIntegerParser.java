@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import bencode.BInteger;
-import bencode.BValueCharacter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
@@ -27,9 +26,9 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 	public ByteBuffer writeToByteBuffer(BInteger value) throws IOException {
 		final StringBuffer buffer = new StringBuffer();
 
-		buffer.append(BValueCharacter.INTEGER);
+		buffer.append(INTEGER);
 		buffer.append(value.getLong());
-		buffer.append(BValueCharacter.END);
+		buffer.append(END);
 
 		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
 	}
@@ -38,7 +37,7 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 	public BInteger readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
 		int c = IBValueParser.get(byteBuffer);
 
-		if (c != BValueCharacter.INTEGER) {
+		if (c != INTEGER) {
 			throw new IllegalArgumentException("Expected 'i', not '" + (char) c + "'");
 		}
 
@@ -46,7 +45,7 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 
 		c = IBValueParser.get(byteBuffer);
 
-		while (c != BValueCharacter.END) {
+		while (c != END) {
 			if (!byteBuffer.hasRemaining()) {
 				throw new IllegalArgumentException("E expected, not '" + (char) c + "'");
 			}

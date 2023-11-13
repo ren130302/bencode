@@ -9,7 +9,6 @@ import bencode.BInteger;
 import bencode.BList;
 import bencode.BString;
 import bencode.IBValue;
-import bencode.BValueCharacter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
@@ -49,11 +48,11 @@ public final class BValueParser implements IBValueParser<IBValue<?>> {
 			return new BStringParser(this.getCharset()).readFromByteBuffer(byteBuffer.reset());
 		}
 		switch (indicator) {
-		case BValueCharacter.INTEGER:
+		case INTEGER:
 			return new BIntegerParser(this.getCharset()).readFromByteBuffer(byteBuffer.reset());
-		case BValueCharacter.LIST:
+		case LIST:
 			return new BListParser(this.getCharset()).readFromByteBuffer(byteBuffer.reset());
-		case BValueCharacter.DICTIONARY:
+		case DICTIONARY:
 			return new BDictionaryParser(this.getCharset()).readFromByteBuffer(byteBuffer.reset());
 		}
 

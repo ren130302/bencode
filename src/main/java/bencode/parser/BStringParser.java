@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import bencode.BString;
-import bencode.BValueCharacter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
@@ -28,7 +27,7 @@ public final class BStringParser implements IBValueParser<BString> {
 		final StringBuffer buffer = new StringBuffer();
 
 		buffer.append(value.getValue().length);
-		buffer.append(BValueCharacter.CORON);
+		buffer.append(CORON);
 		buffer.append(value.getString());
 
 		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
@@ -40,7 +39,7 @@ public final class BStringParser implements IBValueParser<BString> {
 
 		int c = IBValueParser.get(byteBuffer);
 
-		while (c != BValueCharacter.CORON) {
+		while (c != CORON) {
 			if (!byteBuffer.hasRemaining()) {
 				throw new IllegalArgumentException("Expected ':', not '" + (char) c + "'");
 			}

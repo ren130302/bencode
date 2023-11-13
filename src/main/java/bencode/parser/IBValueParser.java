@@ -9,6 +9,15 @@ import lombok.NonNull;
 
 public interface IBValueParser<T extends IBValue<?>> {
 
+	final char INTEGER = 'i';
+	final char LIST = 'l';
+	final char DICTIONARY = 'd';
+	final char END = 'e';
+	final char CORON = ':';
+	final char ZERO = '0';
+	final char ONE = '1';
+	final char NINE = '9';
+
 	Charset getCharset();
 
 	ByteBuffer writeToByteBuffer(@NonNull T value) throws IOException;

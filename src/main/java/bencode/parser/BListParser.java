@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 import bencode.BList;
 import bencode.IBValue;
-import bencode.BValueCharacter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
@@ -28,13 +27,13 @@ public class BListParser implements IBValueParser<BList> {
 	@Override
 	public ByteBuffer writeToByteBuffer(BList value) throws IOException {
 		final StringBuffer buffer = new StringBuffer();
-		buffer.append(BValueCharacter.LIST);
+		buffer.append(LIST);
 
 		for (IBValue<?> v : value.getValue()) {
 			buffer.append(new BValueParser(this.getCharset()).writeToString(v));
 		}
 
-		buffer.append(BValueCharacter.END);
+		buffer.append(END);
 
 		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
 	}
@@ -43,7 +42,7 @@ public class BListParser implements IBValueParser<BList> {
 	public BList readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
 		int c = IBValueParser.get(byteBuffer);
 
-		if (c != BValueCharacter.LIST) {
+		if (c != LIST) {
 			throw new IllegalArgumentException("Expected 'l', not '" + (char) c + "'");
 		}
 
@@ -52,7 +51,7 @@ public class BListParser implements IBValueParser<BList> {
 		IBValue<?> value = null;
 		c = IBValueParser.get(byteBuffer, byteBuffer.position());
 
-		while (c != BValueCharacter.END) {
+		while (c != END) {
 			if (!byteBuffer.hasRemaining()) {
 				throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
 			}
