@@ -1,5 +1,5 @@
 package bencode;
 
 public enum BValueType {
-	BSTRING, BINTEGER, BDICTIONARY, BLIST;
+	STRING, INTEGER, LIST, DICTIONARY;
 }

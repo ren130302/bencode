@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "valueOf")
-public final class BInteger implements BValue<Long> {
+public final class BInteger implements BValue<Long>, Comparable<BInteger> {
 
 	private static final long serialVersionUID = 4188918941802769935L;
 	private final @NonNull Long value;
@@ -44,6 +44,11 @@ public final class BInteger implements BValue<Long> {
 
 	@Override
 	public BValueType getType() {
-		return BValueType.BINTEGER;
+		return BValueType.INTEGER;
+	}
+
+	@Override
+	public int compareTo(BInteger that) {
+		return this.getValue().compareTo(that.getValue());
 	}
 }

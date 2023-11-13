@@ -230,6 +230,6 @@ public final class BList implements BValue<List<BValue<?>>> {
 
 	@Override
 	public BValueType getType() {
-		return BValueType.BLIST;
+		return BValueType.LIST;
 	}
 }

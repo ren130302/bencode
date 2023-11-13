@@ -10,7 +10,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "valueOf")
-public final class BString implements BValue<Byte[]> {
+public final class BString implements BValue<Byte[]>, Comparable<BString> {
 
 	private static final long serialVersionUID = 2812347755822710497L;
 	private final @NonNull Byte[] value;
@@ -92,7 +92,25 @@ public final class BString implements BValue<Byte[]> {
 
 	@Override
 	public BValueType getType() {
-		return BValueType.BSTRING;
+		return BValueType.STRING;
+	}
+
+	@Override
+	public int compareTo(BString that) {
+		final int thisLength = this.getValue().length;
+		final int thatLength = that.getValue().length;
+
+		if (thisLength == thatLength) {
+			for (int index = 0; index < thisLength && index < thatLength; index++) {
+				int sum = Byte.toUnsignedInt(this.getValue()[index]) - Byte.toUnsignedInt(that.getValue()[index]);
+
+				if (sum != 0) {
+					return sum;
+				}
+			}
+		}
+
+		return thisLength - thatLength;
 	}
 
 }

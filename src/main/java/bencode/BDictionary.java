@@ -264,6 +264,6 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 
 	@Override
 	public BValueType getType() {
-		return BValueType.BDICTIONARY;
+		return BValueType.DICTIONARY;
 	}
 }
