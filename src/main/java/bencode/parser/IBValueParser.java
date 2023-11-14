@@ -10,13 +10,10 @@ import lombok.NonNull;
 public interface IBValueParser<T extends BValue<?>> {
 
 	final char CORON = ':';
-	final char DICTIONARY = 'd';
-	final char END = 'e';
 	final char INTEGER = 'i';
 	final char LIST = 'l';
-	final char NINE = '9';
-	final char ONE = '1';
-	final char ZERO = '0';
+	final char DICTIONARY = 'd';
+	final char END = 'e';
 
 	static int get(ByteBuffer byteBuffer) {
 		return Byte.toUnsignedInt(byteBuffer.get());
