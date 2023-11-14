@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import bencode.BDictionary;
 import bencode.BString;
-import bencode.IBValue;
+import bencode.BValue;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
@@ -27,22 +27,6 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 	}
 
 	@Override
-	public ByteBuffer writeToByteBuffer(BDictionary value) throws IOException {
-		final StringBuffer buffer = new StringBuffer();
-
-		buffer.append(DICTIONARY);
-
-		for (Entry<String, IBValue<?>> entry : value.entrySet()) {
-			buffer.append(new BStringParser(this.getCharset()).writeToString(BString.valueOf(entry.getKey())));
-			buffer.append(new BValueParser(this.getCharset()).writeToString(entry.getValue()));
-		}
-
-		buffer.append(END);
-
-		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
-	}
-
-	@Override
 	public BDictionary readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
 		int c = IBValueParser.get(byteBuffer);
 
@@ -50,10 +34,10 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 			throw new IllegalArgumentException("Expected 'd', not '" + (char) c + "'");
 		}
 
-		final Map<String, IBValue<?>> map = new TreeMap<>();
+		final Map<String, BValue<?>> map = new TreeMap<>();
 
 		BString key = null;
-		IBValue<?> value = null;
+		BValue<?> value = null;
 
 		c = IBValueParser.get(byteBuffer, byteBuffer.position());
 
@@ -71,6 +55,22 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 		}
 
 		return BDictionary.create(map);
+	}
+
+	@Override
+	public ByteBuffer writeToByteBuffer(BDictionary value) throws IOException {
+		final StringBuffer buffer = new StringBuffer();
+
+		buffer.append(DICTIONARY);
+
+		for (Entry<String, BValue<?>> entry : value.entrySet()) {
+			buffer.append(new BStringParser(this.getCharset()).writeToString(BString.valueOf(entry.getKey())));
+			buffer.append(new BValueParser(this.getCharset()).writeToString(entry.getValue()));
+		}
+
+		buffer.append(END);
+
+		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
 	}
 
 }

@@ -23,17 +23,6 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 	}
 
 	@Override
-	public ByteBuffer writeToByteBuffer(BInteger value) throws IOException {
-		final StringBuffer buffer = new StringBuffer();
-
-		buffer.append(INTEGER);
-		buffer.append(value.getLong());
-		buffer.append(END);
-
-		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
-	}
-
-	@Override
 	public BInteger readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
 		int c = IBValueParser.get(byteBuffer);
 
@@ -59,5 +48,16 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 
 	private byte[] slice(ByteBuffer byteBuffer, int from, int to) {
 		return Arrays.copyOfRange(byteBuffer.array(), from, to);
+	}
+
+	@Override
+	public ByteBuffer writeToByteBuffer(BInteger value) throws IOException {
+		final StringBuffer buffer = new StringBuffer();
+
+		buffer.append(INTEGER);
+		buffer.append(value.getLong());
+		buffer.append(END);
+
+		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
 	}
 }

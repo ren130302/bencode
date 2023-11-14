@@ -4,9 +4,13 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "valueOf")
-public final class BInteger implements IBValue<Long>, Comparable<BInteger> {
+public final class BInteger implements BValue<Long>, Comparable<BInteger> {
 
 	private static final long serialVersionUID = 4188918941802769935L;
+	public static BInteger valueOf(@NonNull Number value) {
+		return BInteger.valueOf(value.longValue());
+	}
+
 	private final @NonNull Long value;
 
 	@Override
@@ -20,12 +24,9 @@ public final class BInteger implements IBValue<Long>, Comparable<BInteger> {
 		}
 	}
 
-	public static BInteger valueOf(@NonNull Number value) {
-		return BInteger.valueOf(value.longValue());
-	}
-
-	public short getShort() {
-		return this.getValue().shortValue();
+	@Override
+	public int compareTo(BInteger that) {
+		return this.getValue().compareTo(that.getValue());
 	}
 
 	public int getInt() {
@@ -36,10 +37,8 @@ public final class BInteger implements IBValue<Long>, Comparable<BInteger> {
 		return this.getValue().longValue();
 	}
 
-	@Override
-	public String toString() {
-		final StringBuffer buffer = new StringBuffer();
-		return buffer.append(this.getValue()).toString();
+	public short getShort() {
+		return this.getValue().shortValue();
 	}
 
 	@Override
@@ -48,7 +47,9 @@ public final class BInteger implements IBValue<Long>, Comparable<BInteger> {
 	}
 
 	@Override
-	public int compareTo(BInteger that) {
-		return this.getValue().compareTo(that.getValue());
+	public String toString() {
+		final StringBuffer buffer = new StringBuffer();
+		return buffer.append(this.getValue()).toString();
 	}
+
 }

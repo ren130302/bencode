@@ -23,17 +23,6 @@ public final class BStringParser implements IBValueParser<BString> {
 	}
 
 	@Override
-	public ByteBuffer writeToByteBuffer(BString value) throws IOException {
-		final StringBuffer buffer = new StringBuffer();
-
-		buffer.append(value.getValue().length);
-		buffer.append(CORON);
-		buffer.append(value.getString());
-
-		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
-	}
-
-	@Override
 	public BString readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
 		int from = byteBuffer.position();
 
@@ -66,6 +55,17 @@ public final class BStringParser implements IBValueParser<BString> {
 
 	private byte[] slice(ByteBuffer byteBuffer, int from, int to) {
 		return Arrays.copyOfRange(byteBuffer.array(), from, to);
+	}
+
+	@Override
+	public ByteBuffer writeToByteBuffer(BString value) throws IOException {
+		final StringBuffer buffer = new StringBuffer();
+
+		buffer.append(value.getValue().length);
+		buffer.append(CORON);
+		buffer.append(value.getString());
+
+		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
 	}
 
 }

@@ -4,31 +4,29 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
-import bencode.IBValue;
+import bencode.BValue;
 import lombok.NonNull;
 
-public interface IBValueParser<T extends IBValue<?>> {
+public interface IBValueParser<T extends BValue<?>> {
 
-	final char INTEGER = 'i';
-	final char LIST = 'l';
+	final char CORON = ':';
 	final char DICTIONARY = 'd';
 	final char END = 'e';
-	final char CORON = ':';
-	final char ZERO = '0';
-	final char ONE = '1';
+	final char INTEGER = 'i';
+	final char LIST = 'l';
 	final char NINE = '9';
+	final char ONE = '1';
+	final char ZERO = '0';
+
+	static int get(ByteBuffer byteBuffer) {
+		return Byte.toUnsignedInt(byteBuffer.get());
+	}
+
+	static int get(ByteBuffer byteBuffer, int index) {
+		return Byte.toUnsignedInt(byteBuffer.get(index));
+	}
 
 	Charset getCharset();
-
-	ByteBuffer writeToByteBuffer(@NonNull T value) throws IOException;
-
-	default String writeToString(@NonNull T value) throws IOException {
-		return new String(this.writeToBytes(value), this.getCharset());
-	}
-
-	default byte[] writeToBytes(@NonNull T value) throws IOException {
-		return this.writeToByteBuffer(value).array();
-	}
 
 	T readFromByteBuffer(@NonNull ByteBuffer data) throws IOException;
 
@@ -40,11 +38,13 @@ public interface IBValueParser<T extends IBValue<?>> {
 		return this.readFromBytes(data.getBytes(this.getCharset()));
 	}
 
-	static int get(ByteBuffer byteBuffer, int index) {
-		return Byte.toUnsignedInt(byteBuffer.get(index));
+	ByteBuffer writeToByteBuffer(@NonNull T value) throws IOException;
+
+	default byte[] writeToBytes(@NonNull T value) throws IOException {
+		return this.writeToByteBuffer(value).array();
 	}
 
-	static int get(ByteBuffer byteBuffer) {
-		return Byte.toUnsignedInt(byteBuffer.get());
+	default String writeToString(@NonNull T value) throws IOException {
+		return new String(this.writeToBytes(value), this.getCharset());
 	}
 }

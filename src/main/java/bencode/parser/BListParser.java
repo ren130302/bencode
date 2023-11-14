@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import bencode.BList;
-import bencode.IBValue;
+import bencode.BValue;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
@@ -25,20 +25,6 @@ public class BListParser implements IBValueParser<BList> {
 	}
 
 	@Override
-	public ByteBuffer writeToByteBuffer(BList value) throws IOException {
-		final StringBuffer buffer = new StringBuffer();
-		buffer.append(LIST);
-
-		for (IBValue<?> v : value.getValue()) {
-			buffer.append(new BValueParser(this.getCharset()).writeToString(v));
-		}
-
-		buffer.append(END);
-
-		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
-	}
-
-	@Override
 	public BList readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
 		int c = IBValueParser.get(byteBuffer);
 
@@ -46,9 +32,9 @@ public class BListParser implements IBValueParser<BList> {
 			throw new IllegalArgumentException("Expected 'l', not '" + (char) c + "'");
 		}
 
-		final List<IBValue<?>> list = new ArrayList<>();
+		final List<BValue<?>> list = new ArrayList<>();
 
-		IBValue<?> value = null;
+		BValue<?> value = null;
 		c = IBValueParser.get(byteBuffer, byteBuffer.position());
 
 		while (c != END) {
@@ -64,6 +50,20 @@ public class BListParser implements IBValueParser<BList> {
 		final BList result = BList.create(list);
 
 		return result;
+	}
+
+	@Override
+	public ByteBuffer writeToByteBuffer(BList value) throws IOException {
+		final StringBuffer buffer = new StringBuffer();
+		buffer.append(LIST);
+
+		for (BValue<?> v : value.getValue()) {
+			buffer.append(new BValueParser(this.getCharset()).writeToString(v));
+		}
+
+		buffer.append(END);
+
+		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
 	}
 
 }

@@ -16,10 +16,14 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "create")
-public final class BDictionary implements IBValue<Map<String, IBValue<?>>> {
+public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 
 	private static final long serialVersionUID = -7574359365654348201L;
-	private final @NonNull Map<String, IBValue<?>> value;
+	private final @NonNull Map<String, BValue<?>> value;
+
+	public void clear() {
+		this.value.clear();
+	}
 
 	@Override
 	public BDictionary clone() {
@@ -32,14 +36,6 @@ public final class BDictionary implements IBValue<Map<String, IBValue<?>>> {
 		}
 	}
 
-	public int size() {
-		return this.value.size();
-	}
-
-	public boolean isEmpty() {
-		return this.value.isEmpty();
-	}
-
 	public boolean containsKey(Object key) {
 		return this.value.containsKey(key);
 	}
@@ -48,78 +44,54 @@ public final class BDictionary implements IBValue<Map<String, IBValue<?>>> {
 		return this.value.containsValue(value);
 	}
 
-	public IBValue<?> get(Object key) {
-		return this.value.get(key);
-	}
-
-	public IBValue<?> put(String key, IBValue<?> value) {
-		return this.value.put(key, value);
-	}
-
-	public IBValue<?> remove(Object key) {
-		return this.value.remove(key);
-	}
-
-	public void putAll(Map<? extends String, ? extends IBValue<?>> m) {
-		this.value.putAll(m);
-	}
-
-	public void clear() {
-		this.value.clear();
-	}
-
-	public Set<String> keySet() {
-		return this.value.keySet();
-	}
-
-	public Collection<IBValue<?>> values() {
-		return this.value.values();
-	}
-
-	public Set<Entry<String, IBValue<?>>> entrySet() {
+	public Set<Entry<String, BValue<?>>> entrySet() {
 		return this.value.entrySet();
 	}
 
-	public Set<Entry<BString, IBValue<?>>> entrySetConverted() {
-		final Map<BString, IBValue<?>> result = new TreeMap<>();
+	public Set<Entry<BString, BValue<?>>> entrySetConverted() {
+		final Map<BString, BValue<?>> result = new TreeMap<>();
 
-		for (Entry<String, IBValue<?>> entry : this.value.entrySet()) {
+		for (Entry<String, BValue<?>> entry : this.value.entrySet()) {
 			result.put(BString.valueOf(entry.getKey()), entry.getValue());
 		}
 
 		return result.entrySet();
 	}
 
-	public void putIfPresent(String key, IBValue<?> value) {
-		Optional.of(value).ifPresent(v -> this.put(key, v));
+	public void forEach(BiConsumer<BString, BValue<?>> action) {
+		Objects.requireNonNull(action);
+		for (Entry<String, BValue<?>> entry : this.entrySet()) {
+			BString k;
+			BValue<?> v;
+			try {
+				k = BString.valueOf(entry.getKey());
+				v = entry.getValue();
+			} catch (IllegalStateException ise) {
+				// this usually means the entry is no longer in the map.
+				throw new ConcurrentModificationException(ise);
+			}
+			action.accept(k, v);
+		}
 	}
 
-	public <T extends IBValue<?>, V> V getDef(Optional<T> optional, V defaultValue, Function<T, V> func) {
-		return optional.isPresent() ? func.apply(optional.get()) : defaultValue;
-	}
-
-	public <T extends IBValue<?>> Optional<T> getOptionalBValue(String key, Function<IBValue<?>, T> castFunc) {
-		return Optional.ofNullable(castFunc.apply(this.get(key)));
-	}
-
-	/* dictionary */
-
-	public Optional<BDictionary> getOptionalBDictionary(String key) {
-		return this.getOptionalBValue(key, BDictionary.class::cast);
+	public BValue<?> get(Object key) {
+		return this.value.get(key);
 	}
 
 	public BDictionary getBDictionary(String key) {
 		return this.getOptionalBDictionary(key).get();
 	}
 
-	public Map<String, IBValue<?>> getDictionary(String key) {
-		return this.getBDictionary(key).getValue();
+	public BInteger getBInteger(String key) {
+		return this.getOptionalBInteger(key).get();
 	}
 
-	/* string */
+	public BList getBList(String key) {
+		return this.getOptionalBList(key).get();
+	}
 
-	public Optional<BString> getOptionalBString(String key) {
-		return this.getOptionalBValue(key, BString.class::cast);
+	public boolean getBool(String key) {
+		return this.getLong(key, 0) == 1;
 	}
 
 	public BString getBString(String key) {
@@ -128,6 +100,62 @@ public final class BDictionary implements IBValue<Map<String, IBValue<?>>> {
 
 	public Byte[] getBytes(String key) {
 		return this.getBString(key).getValue();
+	}
+
+	public <T extends BValue<?>, V> V getDef(Optional<T> optional, V defaultValue, Function<T, V> func) {
+		return optional.isPresent() ? func.apply(optional.get()) : defaultValue;
+	}
+
+	public Map<String, BValue<?>> getDictionary(String key) {
+		return this.getBDictionary(key).getValue();
+	}
+
+	public int getInt(String key) {
+		return this.getBInteger(key).getInt();
+	}
+
+	/* dictionary */
+
+	public int getInt(String key, int defaultValue) {
+		return this.getDef(this.getOptionalBInteger(key), defaultValue, BInteger::getInt);
+	}
+
+	public long getLong(String key) {
+		return this.getBInteger(key).getLong();
+	}
+
+	public long getLong(String key, long defaultValue) {
+		return this.getDef(this.getOptionalBInteger(key), defaultValue, BInteger::getLong);
+	}
+
+	/* string */
+
+	public Optional<BDictionary> getOptionalBDictionary(String key) {
+		return this.getOptionalBValue(key, BDictionary.class::cast);
+	}
+
+	public Optional<BInteger> getOptionalBInteger(String key) {
+		return this.getOptionalBValue(key, BInteger.class::cast);
+	}
+
+	public Optional<BList> getOptionalBList(String key) {
+		return this.getOptionalBValue(key, BList.class::cast);
+	}
+
+	public Optional<BString> getOptionalBString(String key) {
+		return this.getOptionalBValue(key, BString.class::cast);
+	}
+
+	public <T extends BValue<?>> Optional<T> getOptionalBValue(String key, Function<BValue<?>, T> castFunc) {
+		return Optional.ofNullable(castFunc.apply(this.get(key)));
+	}
+
+	public short getShort(String key) {
+		return this.getBInteger(key).getShort();
+	}
+
+	public short getShort(String key, short defaultValue) {
+		return this.getDef(this.getOptionalBInteger(key), defaultValue, BInteger::getShort);
 	}
 
 	public String getString(String key) {
@@ -142,79 +170,40 @@ public final class BDictionary implements IBValue<Map<String, IBValue<?>>> {
 		return this.getDef(this.getOptionalBString(key), defaultValue, BString::getString);
 	}
 
-	public BString put(String key, byte[] value) {
-		return (BString) this.put(key, BString.valueOf(value));
-	}
-
-	public BString put(String key, String value) {
-		return (BString) this.put(key, BString.valueOf(value));
-	}
-
-	public void putIfPresent(String key, byte[] value) {
-		this.putIfPresent(key, BString.valueOf(value));
-	}
-
-	public void putIfPresent(String key, String value) {
-		this.putIfPresent(key, BString.valueOf(value));
-	}
-
 	/* list */
 
-	public Optional<BList> getOptionalBList(String key) {
-		return this.getOptionalBValue(key, BList.class::cast);
+	@Override
+	public BValueType getType() {
+		return BValueType.DICTIONARY;
 	}
 
-	public BList getBList(String key) {
-		return this.getOptionalBList(key).get();
+	public boolean isEmpty() {
+		return this.value.isEmpty();
 	}
 
 	/* integer */
 
-	public Optional<BInteger> getOptionalBInteger(String key) {
-		return this.getOptionalBValue(key, BInteger.class::cast);
-	}
-
-	public BInteger getBInteger(String key) {
-		return this.getOptionalBInteger(key).get();
-	}
-
-	public short getShort(String key) {
-		return this.getBInteger(key).getShort();
-	}
-
-	public int getInt(String key) {
-		return this.getBInteger(key).getInt();
-	}
-
-	public long getLong(String key) {
-		return this.getBInteger(key).getLong();
-	}
-
-	public short getShort(String key, short defaultValue) {
-		return this.getDef(this.getOptionalBInteger(key), defaultValue, BInteger::getShort);
-	}
-
-	public int getInt(String key, int defaultValue) {
-		return this.getDef(this.getOptionalBInteger(key), defaultValue, BInteger::getInt);
-	}
-
-	public long getLong(String key, long defaultValue) {
-		return this.getDef(this.getOptionalBInteger(key), defaultValue, BInteger::getLong);
-	}
-
-	public boolean getBool(String key) {
-		return this.getLong(key, 0) == 1;
+	public Set<String> keySet() {
+		return this.value.keySet();
 	}
 
 	public BInteger put(String key, boolean value) {
 		return (BInteger) this.put(key, BInteger.valueOf(value ? 1 : 0));
 	}
 
-	public BInteger put(String key, long value) {
-		return (BInteger) this.put(key, BInteger.valueOf(value));
+	public BValue<?> put(String key, BValue<?> value) {
+		return this.value.put(key, value);
+	}
+
+	public BString put(String key, byte[] value) {
+		return (BString) this.put(key, BString.valueOf(value));
 	}
 
 	public BInteger put(String key, int value) {
+		return (BInteger) this.put(key, BInteger.valueOf(value));
+	}
+
+	public BInteger put(String key, long value) {
 		return (BInteger) this.put(key, BInteger.valueOf(value));
 	}
 
@@ -222,11 +211,27 @@ public final class BDictionary implements IBValue<Map<String, IBValue<?>>> {
 		return (BInteger) this.put(key, BInteger.valueOf(value));
 	}
 
-	public void putIfPresent(String key, long value) {
-		this.putIfPresent(key, BInteger.valueOf(value));
+	public BString put(String key, String value) {
+		return (BString) this.put(key, BString.valueOf(value));
+	}
+
+	public void putAll(Map<? extends String, ? extends BValue<?>> m) {
+		this.value.putAll(m);
+	}
+
+	public void putIfPresent(String key, BValue<?> value) {
+		Optional.of(value).ifPresent(v -> this.put(key, v));
+	}
+
+	public void putIfPresent(String key, byte[] value) {
+		this.putIfPresent(key, BString.valueOf(value));
 	}
 
 	public void putIfPresent(String key, int value) {
+		this.putIfPresent(key, BInteger.valueOf(value));
+	}
+
+	public void putIfPresent(String key, long value) {
 		this.putIfPresent(key, BInteger.valueOf(value));
 	}
 
@@ -234,20 +239,16 @@ public final class BDictionary implements IBValue<Map<String, IBValue<?>>> {
 		this.putIfPresent(key, BInteger.valueOf(value));
 	}
 
-	public void forEach(BiConsumer<BString, IBValue<?>> action) {
-		Objects.requireNonNull(action);
-		for (Entry<String, IBValue<?>> entry : this.entrySet()) {
-			BString k;
-			IBValue<?> v;
-			try {
-				k = BString.valueOf(entry.getKey());
-				v = entry.getValue();
-			} catch (IllegalStateException ise) {
-				// this usually means the entry is no longer in the map.
-				throw new ConcurrentModificationException(ise);
-			}
-			action.accept(k, v);
-		}
+	public void putIfPresent(String key, String value) {
+		this.putIfPresent(key, BString.valueOf(value));
+	}
+
+	public BValue<?> remove(Object key) {
+		return this.value.remove(key);
+	}
+
+	public int size() {
+		return this.value.size();
 	}
 
 	@Override
@@ -262,8 +263,7 @@ public final class BDictionary implements IBValue<Map<String, IBValue<?>>> {
 		return buffer.toString();
 	}
 
-	@Override
-	public BValueType getType() {
-		return BValueType.DICTIONARY;
+	public Collection<BValue<?>> values() {
+		return this.value.values();
 	}
 }

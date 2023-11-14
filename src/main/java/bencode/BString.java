@@ -8,21 +8,9 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "valueOf")
-public final class BString implements IBValue<Byte[]>, Comparable<BString> {
+public final class BString implements BValue<Byte[]>, Comparable<BString> {
 
 	private static final long serialVersionUID = 2812347755822710497L;
-	private final @NonNull Byte[] value;
-
-	@Override
-	public BString clone() {
-		try {
-			return (BString) super.clone();
-		} catch (CloneNotSupportedException cnse) {
-			final BString result = valueOf(this.getValue().clone());
-
-			return result;
-		}
-	}
 
 	private static byte[] autoboxing(Byte[] value) {
 		final byte[] result = new byte[value.length];
@@ -48,40 +36,33 @@ public final class BString implements IBValue<Byte[]>, Comparable<BString> {
 		return valueOf(unboxing(value));
 	}
 
+	public static BString valueOf(String value) {
+		return valueOf(Objects.requireNonNullElse(value, "").getBytes());
+	}
+
 	public static BString valueOf(String value, Charset encording) {
-		return valueOf(unboxing(Objects.requireNonNullElse(value, "").getBytes(encording)));
+		return valueOf(Objects.requireNonNullElse(value, "").getBytes(encording));
 	}
 
 	public static BString valueOf(String value, String encording) throws UnsupportedEncodingException {
-		return valueOf(unboxing(Objects.requireNonNullElse(value, "").getBytes(encording)));
+		return valueOf(Objects.requireNonNullElse(value, "").getBytes(encording));
 	}
 
-	public static BString valueOf(String value) {
-		return valueOf(unboxing(Objects.requireNonNullElse(value, "").getBytes()));
-	}
+	private final @NonNull Byte[] value;
 
-	public String getString() {
-		return new String(autoboxing(this.getValue()));
-	}
-
-	public String getString(Charset charset) {
-		return new String(autoboxing(this.getValue()), charset);
+	private BString(Byte[] value) {
+		this.value = value;
 	}
 
 	@Override
-	public String toString() {
-		final StringBuffer buffer = new StringBuffer();
+	public BString clone() {
+		try {
+			return (BString) super.clone();
+		} catch (CloneNotSupportedException cnse) {
+			final BString result = valueOf(this.getValue().clone());
 
-		buffer.append('\"');
-		buffer.append(this.getString());
-		buffer.append('\"');
-
-		return buffer.toString();
-	}
-
-	@Override
-	public BValueType getType() {
-		return BValueType.STRING;
+			return result;
+		}
 	}
 
 	@Override
@@ -100,6 +81,30 @@ public final class BString implements IBValue<Byte[]>, Comparable<BString> {
 		}
 
 		return thisLength - thatLength;
+	}
+
+	public String getString() {
+		return new String(autoboxing(this.getValue()));
+	}
+
+	public String getString(Charset charset) {
+		return new String(autoboxing(this.getValue()), charset);
+	}
+
+	@Override
+	public BValueType getType() {
+		return BValueType.STRING;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuffer buffer = new StringBuffer();
+
+		buffer.append('\"');
+		buffer.append(this.getString());
+		buffer.append('\"');
+
+		return buffer.toString();
 	}
 
 }

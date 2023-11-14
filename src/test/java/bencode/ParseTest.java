@@ -75,13 +75,13 @@ public class ParseTest {
 		this.assertBDictionary(bDict);
 	}
 
-	private void assertBValue(IBValue<?> bValue) throws IOException {
+	private void assertBValue(BValue<?> bValue) throws IOException {
 		final BValueParser valueParsers = new BValueParser(StandardCharsets.UTF_8);
 
 		String serialized = valueParsers.writeToString(bValue);
 		System.out.println(serialized);
 
-		IBValue<?> desirialized = valueParsers.readFromString(serialized);
+		BValue<?> desirialized = valueParsers.readFromString(serialized);
 		System.out.println(desirialized);
 
 		Assertions.assertEquals(bValue, desirialized);
