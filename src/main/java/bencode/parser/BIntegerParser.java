@@ -55,7 +55,7 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 		final StringBuffer buffer = new StringBuffer();
 
 		buffer.append(INTEGER);
-		buffer.append(value.getLong());
+		buffer.append(value.longValue());
 		buffer.append(END);
 
 		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));

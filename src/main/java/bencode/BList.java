@@ -6,9 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -16,42 +14,10 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "create")
-public final class BList implements BValue<List<BValue<?>>> {
+public final class BList implements BValue<List<BValue<?>>>, List<BValue<?>> {
 
 	private static final long serialVersionUID = 1551379075504078235L;
 	private final @NonNull List<BValue<?>> value;
-
-	public boolean add(BValue<?> e) {
-		return this.value.add(e);
-	}
-
-	public void add(byte[] element) {
-		this.value.add(BString.valueOf(element));
-	}
-
-	public void add(int index, BValue<?> element) {
-		this.value.add(index, element);
-	}
-
-	public void add(Number element) {
-		this.value.add(BInteger.valueOf(element));
-	}
-
-	public void add(String element) {
-		this.value.add(BString.valueOf(element));
-	}
-
-	public boolean addAll(Collection<? extends BValue<?>> c) {
-		return this.value.addAll(c);
-	}
-
-	public boolean addAll(int index, Collection<? extends BValue<?>> c) {
-		return this.value.addAll(index, c);
-	}
-
-	public void clear() {
-		this.value.clear();
-	}
 
 	@Override
 	public BList clone() {
@@ -64,23 +30,65 @@ public final class BList implements BValue<List<BValue<?>>> {
 		}
 	}
 
+	@Override
+	public BValueType getType() {
+		return BValueType.LIST;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuffer buffer = new StringBuffer();
+		buffer.append('[');
+		buffer.append(String.join(", ", this.getValue().stream().map(BValue::toString).toList()));
+		buffer.append(']');
+		return buffer.toString();
+	}
+
+	@Override
+	public boolean add(BValue<?> e) {
+		return this.getValue().add(e);
+	}
+
+	public void add(byte[] element) {
+		this.getValue().add(BString.valueOf(element));
+	}
+
+	@Override
+	public void add(int index, BValue<?> element) {
+		this.getValue().add(index, element);
+	}
+
+	public void add(Number element) {
+		this.getValue().add(BInteger.valueOf(element));
+	}
+
+	public void add(String element) {
+		this.getValue().add(BString.valueOf(element));
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends BValue<?>> c) {
+		return this.getValue().addAll(c);
+	}
+
+	@Override
+	public boolean addAll(int index, Collection<? extends BValue<?>> c) {
+		return this.getValue().addAll(index, c);
+	}
+
+	@Override
+	public void clear() {
+		this.getValue().clear();
+	}
+
+	@Override
 	public boolean contains(Object o) {
-		return this.value.contains(o);
+		return this.getValue().contains(o);
 	}
 
-	public boolean containsAll(Collection<BValue<?>> c) {
-		return this.value.containsAll(c);
-	}
-
-	public void forEach(Consumer<BValue<?>> action) {
-		Objects.requireNonNull(action);
-		for (BValue<?> t : this.value) {
-			action.accept(t);
-		}
-	}
-
+	@Override
 	public BValue<?> get(int index) {
-		return this.value.get(index);
+		return this.getValue().get(index);
 	}
 
 	public BDictionary getBDictionary(int index) {
@@ -99,24 +107,20 @@ public final class BList implements BValue<List<BValue<?>>> {
 		return this.getOptionalBString(index).get();
 	}
 
-	/* dictionary */
-
 	public Byte[] getBytes(int index) {
 		return this.getBString(index).getValue();
 	}
 
 	public int getInt(int index) {
-		return this.getBInteger(index).getInt();
+		return this.getBInteger(index).intValue();
 	}
 
 	public List<BValue<?>> getList(int index) {
 		return this.getBList(index).getValue();
 	}
 
-	/* list */
-
 	public long getLong(int index) {
-		return this.getBInteger(index).getLong();
+		return this.getBInteger(index).longValue();
 	}
 
 	public Map<String, BValue<?>> getMap(int index) {
@@ -126,8 +130,6 @@ public final class BList implements BValue<List<BValue<?>>> {
 	public Optional<BDictionary> getOptionalBDictionary(int index) {
 		return this.getOptionalBValue(index, BDictionary.class::cast);
 	}
-
-	/* integer */
 
 	public Optional<BInteger> getOptionalBInteger(int index) {
 		return this.getOptionalBValue(index, BInteger.class::cast);
@@ -146,7 +148,7 @@ public final class BList implements BValue<List<BValue<?>>> {
 	}
 
 	public short getShort(int index) {
-		return this.getBInteger(index).getShort();
+		return this.getBInteger(index).shortValue();
 	}
 
 	/* string */
@@ -156,80 +158,87 @@ public final class BList implements BValue<List<BValue<?>>> {
 	}
 
 	@Override
-	public BValueType getType() {
-		return BValueType.LIST;
-	}
-
-	public int indexOf(BValue<?> o) {
-		return this.value.indexOf(o);
-	}
-
-	public boolean isEmpty() {
-		return this.value.isEmpty();
-	}
-
-	public Iterator<BValue<?>> iterator() {
-		return this.value.iterator();
-	}
-
-	public int lastIndexOf(BValue<?> o) {
-		return this.value.lastIndexOf(o);
-	}
-
-	public ListIterator<BValue<?>> listIterator() {
-		return this.value.listIterator();
-	}
-
-	public ListIterator<BValue<?>> listIterator(int index) {
-		return this.value.listIterator(index);
-	}
-
-	public boolean remove(BValue<?> o) {
-		return this.value.remove(o);
-	}
-
-	public BValue<?> remove(int index) {
-		return this.value.remove(index);
-	}
-
-	public boolean removeAll(Collection<BValue<?>> c) {
-		return this.value.removeAll(c);
-	}
-
-	public boolean retainAll(Collection<BValue<?>> c) {
-		return this.value.retainAll(c);
-	}
-
-	public BValue<?> set(int index, BValue<?> element) {
-		return this.value.set(index, element);
-	}
-
-	public int size() {
-		return this.value.size();
-	}
-
-	public Stream<BValue<?>> stream() {
-		return this.value.stream();
-	}
-
-	public List<BValue<?>> subList(int fromIndex, int toIndex) {
-		return this.value.subList(fromIndex, toIndex);
-	}
-
-	public BValue<?>[] toArray() {
-		return (BValue[]) this.value.toArray();
-	}
-
-	public BValue<?>[] toArray(BValue<?>[] a) {
-		return this.value.toArray(a);
+	public int indexOf(Object o) {
+		return this.getValue().indexOf(o);
 	}
 
 	@Override
-	public String toString() {
-		final StringBuffer buffer = new StringBuffer();
-		buffer.append('[');
-		buffer.append(String.join(", ", this.getValue().stream().map(BValue::toString).toList()));
-		buffer.append(']');
-		return buffer.toString();
+	public boolean isEmpty() {
+		return this.getValue().isEmpty();
+	}
+
+	@Override
+	public Iterator<BValue<?>> iterator() {
+		return this.getValue().iterator();
+	}
+
+	@Override
+	public int lastIndexOf(Object o) {
+		return this.getValue().lastIndexOf(o);
+	}
+
+	@Override
+	public ListIterator<BValue<?>> listIterator() {
+		return this.getValue().listIterator();
+	}
+
+	@Override
+	public ListIterator<BValue<?>> listIterator(int index) {
+		return this.getValue().listIterator(index);
+	}
+
+	@Override
+	public boolean remove(Object o) {
+		return this.getValue().remove(o);
+	}
+
+	@Override
+	public BValue<?> remove(int index) {
+		return this.getValue().remove(index);
+	}
+
+	@Override
+	public BValue<?> set(int index, BValue<?> element) {
+		return this.getValue().set(index, element);
+	}
+
+	@Override
+	public int size() {
+		return this.getValue().size();
+	}
+
+	@Override
+	public Stream<BValue<?>> stream() {
+		return this.getValue().stream();
+	}
+
+	@Override
+	public List<BValue<?>> subList(int fromIndex, int toIndex) {
+		return this.getValue().subList(fromIndex, toIndex);
+	}
+
+	@Override
+	public BValue<?>[] toArray() {
+		return (BValue[]) this.getValue().toArray();
+	}
+
+	@Override
+	public <T> T[] toArray(T[] a) {
+		return this.getValue().toArray(a);
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		return this.getValue().containsAll(c);
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		return this.getValue().removeAll(c);
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		return this.getValue().retainAll(c);
 	}
 }

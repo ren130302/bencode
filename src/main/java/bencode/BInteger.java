@@ -1,12 +1,15 @@
 package bencode;
 
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "valueOf")
-public final class BInteger implements BValue<Long>, Comparable<BInteger> {
+@EqualsAndHashCode(callSuper = false)
+public final class BInteger extends Number implements BValue<Long>, Comparable<BInteger> {
 
 	private static final long serialVersionUID = 4188918941802769935L;
+
 	public static BInteger valueOf(@NonNull Number value) {
 		return BInteger.valueOf(value.longValue());
 	}
@@ -25,23 +28,6 @@ public final class BInteger implements BValue<Long>, Comparable<BInteger> {
 	}
 
 	@Override
-	public int compareTo(BInteger that) {
-		return this.getValue().compareTo(that.getValue());
-	}
-
-	public int getInt() {
-		return this.getValue().intValue();
-	}
-
-	public long getLong() {
-		return this.getValue().longValue();
-	}
-
-	public short getShort() {
-		return this.getValue().shortValue();
-	}
-
-	@Override
 	public BValueType getType() {
 		return BValueType.INTEGER;
 	}
@@ -50,6 +36,31 @@ public final class BInteger implements BValue<Long>, Comparable<BInteger> {
 	public String toString() {
 		final StringBuffer buffer = new StringBuffer();
 		return buffer.append(this.getValue()).toString();
+	}
+
+	@Override
+	public int compareTo(BInteger that) {
+		return this.getValue().compareTo(that.getValue());
+	}
+
+	@Override
+	public int intValue() {
+		return this.getValue().intValue();
+	}
+
+	@Override
+	public long longValue() {
+		return this.getValue().longValue();
+	}
+
+	@Override
+	public float floatValue() {
+		return this.getValue().floatValue();
+	}
+
+	@Override
+	public double doubleValue() {
+		return this.getValue().doubleValue();
 	}
 
 }

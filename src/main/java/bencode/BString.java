@@ -66,6 +66,22 @@ public final class BString implements BValue<Byte[]>, Comparable<BString> {
 	}
 
 	@Override
+	public BValueType getType() {
+		return BValueType.STRING;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuffer buffer = new StringBuffer();
+
+		buffer.append('\"');
+		buffer.append(this.getString());
+		buffer.append('\"');
+
+		return buffer.toString();
+	}
+
+	@Override
 	public int compareTo(BString that) {
 		final int thisLength = this.getValue().length;
 		final int thatLength = that.getValue().length;
@@ -89,22 +105,6 @@ public final class BString implements BValue<Byte[]>, Comparable<BString> {
 
 	public String getString(Charset charset) {
 		return new String(autoboxing(this.getValue()), charset);
-	}
-
-	@Override
-	public BValueType getType() {
-		return BValueType.STRING;
-	}
-
-	@Override
-	public String toString() {
-		final StringBuffer buffer = new StringBuffer();
-
-		buffer.append('\"');
-		buffer.append(this.getString());
-		buffer.append('\"');
-
-		return buffer.toString();
 	}
 
 }

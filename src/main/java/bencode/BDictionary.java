@@ -2,28 +2,20 @@ package bencode;
 
 import java.nio.charset.Charset;
 import java.util.Collection;
-import java.util.ConcurrentModificationException;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "create")
-public final class BDictionary implements BValue<Map<String, BValue<?>>> {
+public final class BDictionary implements BValue<Map<String, BValue<?>>>, Map<String, BValue<?>> {
 
 	private static final long serialVersionUID = -7574359365654348201L;
 	private final @NonNull Map<String, BValue<?>> value;
-
-	public void clear() {
-		this.value.clear();
-	}
 
 	@Override
 	public BDictionary clone() {
@@ -36,46 +28,56 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 		}
 	}
 
+	@Override
+	public BValueType getType() {
+		return BValueType.DICTIONARY;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuffer buffer = new StringBuffer();
+		buffer.append('{');
+		buffer.append(String.join(", ",
+				this.getValue().entrySet().stream()
+						.map(entry -> BString.valueOf(entry.getKey()).toString() + ":" + entry.getValue().toString())
+						.toList()));
+		buffer.append('}');
+		return buffer.toString();
+	}
+
+	@Override
+	public void clear() {
+		this.getValue().clear();
+	}
+
+	@Override
 	public boolean containsKey(Object key) {
-		return this.value.containsKey(key);
+		return this.getValue().containsKey(key);
 	}
 
+	@Override
 	public boolean containsValue(Object value) {
-		return this.value.containsValue(value);
+		return this.getValue().containsValue(value);
 	}
 
+	@Override
 	public Set<Entry<String, BValue<?>>> entrySet() {
-		return this.value.entrySet();
+		return this.getValue().entrySet();
 	}
 
 	public Set<Entry<BString, BValue<?>>> entrySetConverted() {
 		final Map<BString, BValue<?>> result = new TreeMap<>();
 
-		for (Entry<String, BValue<?>> entry : this.value.entrySet()) {
+		for (Entry<String, BValue<?>> entry : this.getValue().entrySet()) {
 			result.put(BString.valueOf(entry.getKey()), entry.getValue());
 		}
 
 		return result.entrySet();
 	}
 
-	public void forEach(BiConsumer<BString, BValue<?>> action) {
-		Objects.requireNonNull(action);
-		for (Entry<String, BValue<?>> entry : this.entrySet()) {
-			BString k;
-			BValue<?> v;
-			try {
-				k = BString.valueOf(entry.getKey());
-				v = entry.getValue();
-			} catch (IllegalStateException ise) {
-				// this usually means the entry is no longer in the map.
-				throw new ConcurrentModificationException(ise);
-			}
-			action.accept(k, v);
-		}
-	}
-
+	@Override
 	public BValue<?> get(Object key) {
-		return this.value.get(key);
+		return this.getValue().get(key);
 	}
 
 	public BDictionary getBDictionary(String key) {
@@ -111,24 +113,20 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 	}
 
 	public int getInt(String key) {
-		return this.getBInteger(key).getInt();
+		return this.getBInteger(key).intValue();
 	}
 
-	/* dictionary */
-
 	public int getInt(String key, int defaultValue) {
-		return this.getDef(this.getOptionalBInteger(key), defaultValue, BInteger::getInt);
+		return this.getDef(this.getOptionalBInteger(key), defaultValue, BInteger::intValue);
 	}
 
 	public long getLong(String key) {
-		return this.getBInteger(key).getLong();
+		return this.getBInteger(key).longValue();
 	}
 
 	public long getLong(String key, long defaultValue) {
-		return this.getDef(this.getOptionalBInteger(key), defaultValue, BInteger::getLong);
+		return this.getDef(this.getOptionalBInteger(key), defaultValue, BInteger::longValue);
 	}
-
-	/* string */
 
 	public Optional<BDictionary> getOptionalBDictionary(String key) {
 		return this.getOptionalBValue(key, BDictionary.class::cast);
@@ -151,11 +149,11 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 	}
 
 	public short getShort(String key) {
-		return this.getBInteger(key).getShort();
+		return this.getBInteger(key).shortValue();
 	}
 
 	public short getShort(String key, short defaultValue) {
-		return this.getDef(this.getOptionalBInteger(key), defaultValue, BInteger::getShort);
+		return this.getDef(this.getOptionalBInteger(key), defaultValue, BInteger::shortValue);
 	}
 
 	public String getString(String key) {
@@ -170,29 +168,23 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 		return this.getDef(this.getOptionalBString(key), defaultValue, BString::getString);
 	}
 
-	/* list */
+	@Override
+	public boolean isEmpty() {
+		return this.getValue().isEmpty();
+	}
 
 	@Override
-	public BValueType getType() {
-		return BValueType.DICTIONARY;
-	}
-
-	public boolean isEmpty() {
-		return this.value.isEmpty();
-	}
-
-	/* integer */
-
 	public Set<String> keySet() {
-		return this.value.keySet();
+		return this.getValue().keySet();
 	}
 
 	public BInteger put(String key, boolean value) {
 		return (BInteger) this.put(key, BInteger.valueOf(value ? 1 : 0));
 	}
 
+	@Override
 	public BValue<?> put(String key, BValue<?> value) {
-		return this.value.put(key, value);
+		return this.getValue().put(key, value);
 	}
 
 	public BString put(String key, byte[] value) {
@@ -215,8 +207,9 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 		return (BString) this.put(key, BString.valueOf(value));
 	}
 
+	@Override
 	public void putAll(Map<? extends String, ? extends BValue<?>> m) {
-		this.value.putAll(m);
+		this.getValue().putAll(m);
 	}
 
 	public void putIfPresent(String key, BValue<?> value) {
@@ -243,27 +236,18 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>> {
 		this.putIfPresent(key, BString.valueOf(value));
 	}
 
+	@Override
 	public BValue<?> remove(Object key) {
-		return this.value.remove(key);
-	}
-
-	public int size() {
-		return this.value.size();
+		return this.getValue().remove(key);
 	}
 
 	@Override
-	public String toString() {
-		final StringBuffer buffer = new StringBuffer();
-		buffer.append('{');
-		buffer.append(String.join(", ",
-				this.getValue().entrySet().stream()
-						.map(entry -> BString.valueOf(entry.getKey()).toString() + ":" + entry.getValue().toString())
-						.toList()));
-		buffer.append('}');
-		return buffer.toString();
+	public int size() {
+		return this.getValue().size();
 	}
 
+	@Override
 	public Collection<BValue<?>> values() {
-		return this.value.values();
+		return this.getValue().values();
 	}
 }
