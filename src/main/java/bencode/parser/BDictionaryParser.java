@@ -28,7 +28,7 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 
 	@Override
 	public BDictionary readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
-		int c = IBValueParser.get(byteBuffer);
+		int c = ParseUtils.get(byteBuffer);
 
 		if (c != DICTIONARY) {
 			throw new IllegalArgumentException("Expected 'd', not '" + (char) c + "'");
@@ -39,7 +39,7 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 		BString key = null;
 		BValue<?> value = null;
 
-		c = IBValueParser.get(byteBuffer, byteBuffer.position());
+		c = ParseUtils.get(byteBuffer, byteBuffer.position());
 
 		while (c != END) {
 			if (!byteBuffer.hasRemaining()) {
@@ -51,7 +51,7 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 
 			map.put(key.getString(), value);
 
-			c = IBValueParser.get(byteBuffer, byteBuffer.position());
+			c = ParseUtils.get(byteBuffer, byteBuffer.position());
 		}
 
 		return BDictionary.create(map);

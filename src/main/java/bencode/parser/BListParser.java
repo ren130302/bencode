@@ -26,7 +26,7 @@ public class BListParser implements IBValueParser<BList> {
 
 	@Override
 	public BList readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
-		int c = IBValueParser.get(byteBuffer);
+		int c = ParseUtils.get(byteBuffer);
 
 		if (c != LIST) {
 			throw new IllegalArgumentException("Expected 'l', not '" + (char) c + "'");
@@ -35,7 +35,7 @@ public class BListParser implements IBValueParser<BList> {
 		final List<BValue<?>> list = new ArrayList<>();
 
 		BValue<?> value = null;
-		c = IBValueParser.get(byteBuffer, byteBuffer.position());
+		c = ParseUtils.get(byteBuffer, byteBuffer.position());
 
 		while (c != END) {
 			if (!byteBuffer.hasRemaining()) {
@@ -44,7 +44,7 @@ public class BListParser implements IBValueParser<BList> {
 
 			value = new BValueParser(this.getCharset()).readFromByteBuffer(byteBuffer);
 			list.add(value);
-			c = IBValueParser.get(byteBuffer, byteBuffer.position());
+			c = ParseUtils.get(byteBuffer, byteBuffer.position());
 		}
 
 		final BList result = BList.create(list);

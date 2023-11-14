@@ -15,14 +15,6 @@ public interface IBValueParser<T extends BValue<?>> {
 	final char DICTIONARY = 'd';
 	final char END = 'e';
 
-	static int get(ByteBuffer byteBuffer) {
-		return Byte.toUnsignedInt(byteBuffer.get());
-	}
-
-	static int get(ByteBuffer byteBuffer, int index) {
-		return Byte.toUnsignedInt(byteBuffer.get(index));
-	}
-
 	Charset getCharset();
 
 	T readFromByteBuffer(@NonNull ByteBuffer data) throws IOException;

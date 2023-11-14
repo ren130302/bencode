@@ -24,7 +24,7 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 
 	@Override
 	public BInteger readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
-		int c = IBValueParser.get(byteBuffer);
+		int c = ParseUtils.get(byteBuffer);
 
 		if (c != INTEGER) {
 			throw new IllegalArgumentException("Expected 'i', not '" + (char) c + "'");
@@ -32,13 +32,13 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 
 		int from = byteBuffer.position();
 
-		c = IBValueParser.get(byteBuffer);
+		c = ParseUtils.get(byteBuffer);
 
 		while (c != END) {
 			if (!byteBuffer.hasRemaining()) {
 				throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
 			}
-			c = IBValueParser.get(byteBuffer);
+			c = ParseUtils.get(byteBuffer);
 		}
 		int to = byteBuffer.position() - 1;
 		int number = Integer.parseInt(new String(this.slice(byteBuffer, from, to), this.getCharset()));

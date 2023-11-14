@@ -24,18 +24,17 @@ public final class BValueParser implements IBValueParser<BValue<?>> {
 
 	@Override
 	public BValue<?> readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
-		byteBuffer.mark();
-		int indicator = IBValueParser.get(byteBuffer);
+		int indicator = ParseUtils.get(byteBuffer, byteBuffer.position() + 1);
 		if (Character.isDigit(indicator)) {
-			return new BStringParser(this.getCharset()).readFromByteBuffer(byteBuffer.reset());
+			return new BStringParser(this.getCharset()).readFromByteBuffer(byteBuffer);
 		}
 		switch (indicator) {
 		case INTEGER:
-			return new BIntegerParser(this.getCharset()).readFromByteBuffer(byteBuffer.reset());
+			return new BIntegerParser(this.getCharset()).readFromByteBuffer(byteBuffer);
 		case LIST:
-			return new BListParser(this.getCharset()).readFromByteBuffer(byteBuffer.reset());
+			return new BListParser(this.getCharset()).readFromByteBuffer(byteBuffer);
 		case DICTIONARY:
-			return new BDictionaryParser(this.getCharset()).readFromByteBuffer(byteBuffer.reset());
+			return new BDictionaryParser(this.getCharset()).readFromByteBuffer(byteBuffer);
 		}
 
 		throw new IOException("" + (char) indicator);
