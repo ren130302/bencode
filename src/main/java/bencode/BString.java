@@ -2,8 +2,6 @@ package bencode;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 import lombok.NonNull;
@@ -73,21 +71,12 @@ public final class BString implements IBValue<Byte[]>, Comparable<BString> {
 	@Override
 	public String toString() {
 		final StringBuffer buffer = new StringBuffer();
-		final StringBuffer bytes = new StringBuffer();
-		final List<Byte> list = Arrays.asList(this.getValue());
-		final boolean hasNegativeValue = list.stream().anyMatch(v -> v < 0);
 
-		if (hasNegativeValue) {
-			bytes.append('[');
-			bytes.append(String.join(", ", list.stream().map(v -> Byte.toString(v)).toList()));
-			bytes.append(']');
-		} else {
-			bytes.append('\"');
-			bytes.append(this.getString());
-			bytes.append('\"');
-		}
+		buffer.append('\"');
+		buffer.append(this.getString());
+		buffer.append('\"');
 
-		return buffer.append(bytes).toString();
+		return buffer.toString();
 	}
 
 	@Override
