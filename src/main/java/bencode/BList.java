@@ -5,9 +5,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import lombok.NonNull;
@@ -49,21 +46,9 @@ public final class BList implements BValue<List<BValue<?>>>, List<BValue<?>> {
 		return this.getValue().add(e);
 	}
 
-	public void add(byte[] element) {
-		this.getValue().add(BString.valueOf(element));
-	}
-
 	@Override
 	public void add(int index, BValue<?> element) {
 		this.getValue().add(index, element);
-	}
-
-	public void add(Number element) {
-		this.getValue().add(BInteger.valueOf(element));
-	}
-
-	public void add(String element) {
-		this.getValue().add(BString.valueOf(element));
 	}
 
 	@Override
@@ -92,69 +77,19 @@ public final class BList implements BValue<List<BValue<?>>>, List<BValue<?>> {
 	}
 
 	public BDictionary getBDictionary(int index) {
-		return this.getOptionalBDictionary(index).get();
+		return (BDictionary) this.get(index);
 	}
 
 	public BInteger getBInteger(int index) {
-		return this.getOptionalBInteger(index).get();
+		return (BInteger) this.get(index);
 	}
 
 	public BList getBList(int index) {
-		return this.getOptionalBList(index).get();
+		return (BList) this.get(index);
 	}
 
 	public BString getBString(int index) {
-		return this.getOptionalBString(index).get();
-	}
-
-	public Byte[] getBytes(int index) {
-		return this.getBString(index).getValue();
-	}
-
-	public int getInt(int index) {
-		return this.getBInteger(index).intValue();
-	}
-
-	public List<BValue<?>> getList(int index) {
-		return this.getBList(index).getValue();
-	}
-
-	public long getLong(int index) {
-		return this.getBInteger(index).longValue();
-	}
-
-	public Map<String, BValue<?>> getMap(int index) {
-		return this.getBDictionary(index).getValue();
-	}
-
-	public Optional<BDictionary> getOptionalBDictionary(int index) {
-		return this.getOptionalBValue(index, BDictionary.class::cast);
-	}
-
-	public Optional<BInteger> getOptionalBInteger(int index) {
-		return this.getOptionalBValue(index, BInteger.class::cast);
-	}
-
-	public Optional<BList> getOptionalBList(int index) {
-		return this.getOptionalBValue(index, BList.class::cast);
-	}
-
-	public Optional<BString> getOptionalBString(int index) {
-		return this.getOptionalBValue(index, BString.class::cast);
-	}
-
-	public <T extends BValue<?>> Optional<T> getOptionalBValue(int index, Function<BValue<?>, T> castFunc) {
-		return Optional.ofNullable(castFunc.apply(this.get(index)));
-	}
-
-	public short getShort(int index) {
-		return this.getBInteger(index).shortValue();
-	}
-
-	/* string */
-
-	public String getString(int index) {
-		return this.getBString(index).getString();
+		return (BString) this.get(index);
 	}
 
 	@Override
