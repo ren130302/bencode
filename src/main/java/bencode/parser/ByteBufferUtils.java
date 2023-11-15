@@ -24,8 +24,8 @@ class ByteBufferUtils {
 		}
 	}
 
-	static void wasEnded() throws IOException {
-
+	static IllegalArgumentException createUnknownValueType() {
+		return new IllegalArgumentException("Unknown value type.");
 	}
 
 	static byte[] slice(ByteBuffer byteBuffer, int from, int to) {
