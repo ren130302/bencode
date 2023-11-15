@@ -15,7 +15,11 @@ public interface IBValueParser<T extends BValue<?>> {
 	final char DICTIONARY = 'd';
 	final char END = 'e';
 
-	Charset getCharset();
+	BValueParsers getParsers();
+
+	default Charset getCharset() {
+		return this.getParsers().getCharset();
+	}
 
 	T readFromByteBuffer(@NonNull ByteBuffer data) throws IOException;
 

@@ -3,8 +3,9 @@ package bencode.parser;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
-class ParseUtils {
+class ByteBufferUtils {
 	static int get(ByteBuffer byteBuffer) throws EOFException {
 		hasRemaining(byteBuffer);
 
@@ -23,4 +24,11 @@ class ParseUtils {
 		}
 	}
 
+	static void wasEnded() throws IOException {
+
+	}
+
+	static byte[] slice(ByteBuffer byteBuffer, int from, int to) {
+		return Arrays.copyOfRange(byteBuffer.array(), from, to);
+	}
 }
