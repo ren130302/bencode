@@ -15,22 +15,23 @@ import bencode.parser.BIntegerParser;
 import bencode.parser.BListParser;
 import bencode.parser.BStringParser;
 import bencode.parser.BValueParser;
+import bencode.parser.BValueParsers;
 
 //@Log
 public class ParseTest {
+	private final BValueParsers valueParsers = new BValueParsers(StandardCharsets.UTF_8);
 
 	@Test
 	public void test() throws IOException {
-		final BValueParser valueParsers = new BValueParser(StandardCharsets.UTF_8);
 
 		try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("bittorrent-v2-test.torrent")) {
 //			log.fine(text);
-			BDictionary desirialized = (BDictionary) valueParsers
+			BDictionary desirialized = this.valueParsers.getBDictionaryParser()
 					.readFromByteBuffer(ByteBuffer.wrap(inputStream.readAllBytes()));
 //			log.fine("" + desirialized);
 			System.out.println(desirialized);
-			ByteBuffer serialized = valueParsers.writeToByteBuffer(desirialized);
+			ByteBuffer serialized = this.valueParsers.getBDictionaryParser().writeToByteBuffer(desirialized);
 //			log.fine(serialized);
 			System.out.println(serialized);
 		}
@@ -38,11 +39,11 @@ public class ParseTest {
 		try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("bittorrent-v2-hybrid-test.torrent")) {
 //			log.fine(text);
-			BDictionary desirialized = (BDictionary) valueParsers
+			BDictionary desirialized = this.valueParsers.getBDictionaryParser()
 					.readFromByteBuffer(ByteBuffer.wrap(inputStream.readAllBytes()));
 //			log.fine("" + desirialized);
 			System.out.println(desirialized);
-			ByteBuffer serialized = valueParsers.writeToByteBuffer(desirialized);
+			ByteBuffer serialized = this.valueParsers.getBDictionaryParser().writeToByteBuffer(desirialized);
 //			log.fine(serialized);
 			System.out.println(serialized);
 		}
@@ -76,19 +77,19 @@ public class ParseTest {
 	}
 
 	private void assertBValue(BValue<?> bValue) throws IOException {
-		final BValueParser valueParsers = new BValueParser(StandardCharsets.UTF_8);
+		final BValueParser valueParser = this.valueParsers.getBValueParser();
 
-		String serialized = valueParsers.writeToString(bValue);
+		String serialized = valueParser.writeToString(bValue);
 		System.out.println(serialized);
 
-		BValue<?> desirialized = valueParsers.readFromString(serialized);
+		BValue<?> desirialized = valueParser.readFromString(serialized);
 		System.out.println(desirialized);
 
 		Assertions.assertEquals(bValue, desirialized);
 	}
 
 	private void assertBString(BString bValue) throws IOException {
-		final BStringParser valueParsers = new BStringParser(StandardCharsets.UTF_8);
+		final BStringParser valueParsers = this.valueParsers.getBStringParser();
 
 		String serialized = valueParsers.writeToString(bValue);
 		System.out.println(serialized);
@@ -100,7 +101,7 @@ public class ParseTest {
 	}
 
 	private void assertBInteger(BInteger bValue) throws IOException {
-		final BIntegerParser valueParsers = new BIntegerParser(StandardCharsets.UTF_8);
+		final BIntegerParser valueParsers = this.valueParsers.getBIntegerParser();
 
 		String serialized = valueParsers.writeToString(bValue);
 		System.out.println(serialized);
@@ -112,7 +113,7 @@ public class ParseTest {
 	}
 
 	private void assertBList(BList bValue) throws IOException {
-		final BListParser valueParsers = new BListParser(StandardCharsets.UTF_8);
+		final BListParser valueParsers = this.valueParsers.getBListParser();
 
 		String serialized = valueParsers.writeToString(bValue);
 		System.out.println(serialized);
@@ -124,7 +125,7 @@ public class ParseTest {
 	}
 
 	private void assertBDictionary(BDictionary bValue) throws IOException {
-		final BDictionaryParser valueParsers = new BDictionaryParser(StandardCharsets.UTF_8);
+		final BDictionaryParser valueParsers = this.valueParsers.getBDictionaryParser();
 
 		String serialized = valueParsers.writeToString(bValue);
 		System.out.println(serialized);

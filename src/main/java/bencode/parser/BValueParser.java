@@ -17,7 +17,7 @@ public final class BValueParser implements IBValueParser<BValue<?>> {
 
 	@Override
 	public BValue<?> readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
-		int indicator = ByteBufferUtils.get(byteBuffer, byteBuffer.position() + 1);
+		int indicator = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
 		if (Character.isDigit(indicator)) {
 			return this.getParsers().getBStringParser().readFromByteBuffer(byteBuffer);
 		}
