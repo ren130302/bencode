@@ -9,8 +9,6 @@ public interface BValue<T> extends Serializable, Cloneable {
 	@Override
 	boolean equals(Object obj);
 
-	BValueType getType();
-
 	T getValue();
 
 	@Override

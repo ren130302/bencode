@@ -14,6 +14,11 @@ import lombok.Value;
 public final class BList implements BValue<List<BValue<?>>>, List<BValue<?>> {
 
 	private static final long serialVersionUID = 1551379075504078235L;
+
+	public static BList create() {
+		return create(new ArrayList<>());
+	}
+
 	private final @NonNull List<BValue<?>> value;
 
 	@Override
@@ -25,11 +30,6 @@ public final class BList implements BValue<List<BValue<?>>>, List<BValue<?>> {
 
 			return result;
 		}
-	}
-
-	@Override
-	public BValueType getType() {
-		return BValueType.LIST;
 	}
 
 	@Override

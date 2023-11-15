@@ -35,7 +35,7 @@ public final class BListParser implements IBValueParser<BList> {
 				throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
 			}
 
-			value = this.getParsers().getBValueParser().readFromByteBuffer(byteBuffer);
+			value = this.parsers.getBValueParser().readFromByteBuffer(byteBuffer);
 			list.add(value);
 			c = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
 		}
@@ -51,7 +51,7 @@ public final class BListParser implements IBValueParser<BList> {
 		buffer.append(LIST);
 
 		for (BValue<?> v : value.getValue()) {
-			buffer.append(this.getParsers().getBValueParser().writeToString(v));
+			buffer.append(this.parsers.getBValueParser().writeToString(v));
 		}
 
 		buffer.append(END);

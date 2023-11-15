@@ -50,10 +50,6 @@ public final class BString implements BValue<Byte[]>, Comparable<BString> {
 
 	private final @NonNull Byte[] value;
 
-	private BString(Byte[] value) {
-		this.value = value;
-	}
-
 	@Override
 	public BString clone() {
 		try {
@@ -63,11 +59,6 @@ public final class BString implements BValue<Byte[]>, Comparable<BString> {
 
 			return result;
 		}
-	}
-
-	@Override
-	public BValueType getType() {
-		return BValueType.STRING;
 	}
 
 	@Override

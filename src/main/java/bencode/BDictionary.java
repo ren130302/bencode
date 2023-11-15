@@ -12,6 +12,11 @@ import lombok.Value;
 public final class BDictionary implements BValue<Map<String, BValue<?>>>, Map<String, BValue<?>> {
 
 	private static final long serialVersionUID = -7574359365654348201L;
+
+	public static BDictionary create() {
+		return create(new TreeMap<>());
+	}
+
 	private final @NonNull Map<String, BValue<?>> value;
 
 	@Override
@@ -23,11 +28,6 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>>, Map<St
 
 			return result;
 		}
-	}
-
-	@Override
-	public BValueType getType() {
-		return BValueType.DICTIONARY;
 	}
 
 	@Override
