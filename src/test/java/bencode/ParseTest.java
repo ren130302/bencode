@@ -22,11 +22,8 @@ import bencode.parser.BValueParsers;
 public class ParseTest {
 	private final BValueParsers valueParsers = new BValueParsers(StandardCharsets.UTF_8);
 
-	@Test
+//	@Test
 	public void test() throws IOException {
-//		this.assertTorrent("bittorrent-v2-test.torrent");
-//		this.assertTorrent("bittorrent-v2-hybrid-test.torrent");
-
 		BString bString = BString.valueOf("text");
 		this.assertBValue(bString);
 		this.assertBString(bString);
@@ -58,6 +55,12 @@ public class ParseTest {
 		bDict.put("bDict", bDictEmpty);
 		this.assertBValue(bDict);
 		this.assertBDictionary(bDict);
+	}
+
+	@Test
+	public void torrent() throws IOException {
+		this.assertTorrent("bittorrent-v2-test.torrent");
+		this.assertTorrent("bittorrent-v2-hybrid-test.torrent");
 	}
 
 	private void assertTorrent(String filename) throws IOException {

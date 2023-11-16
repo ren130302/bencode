@@ -27,7 +27,9 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 		c = ByteBufferUtils.get(byteBuffer);
 
 		while (c != END) {
-			strBuf.append((char) c);
+			if (c == NEGA || Character.isDigit(c)) {
+				strBuf.append((char) c);
+			}
 			c = ByteBufferUtils.get(byteBuffer);
 		}
 

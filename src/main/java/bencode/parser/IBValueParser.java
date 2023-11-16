@@ -14,6 +14,7 @@ public interface IBValueParser<T extends BValue<?>> {
 	final char LIST = 'l';
 	final char DICTIONARY = 'd';
 	final char END = 'e';
+	final char NEGA = '-';
 
 	BValueParsers getParsers();
 

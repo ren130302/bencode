@@ -35,6 +35,8 @@ public final class BListParser implements IBValueParser<BList> {
 
 			c = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
 		}
+		// drop 'e'
+		byteBuffer.get();
 
 		return result;
 	}

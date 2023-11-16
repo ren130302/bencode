@@ -38,9 +38,11 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 
 			result.put(key.getString(), value);
 
-			c = ByteBufferUtils.get(byteBuffer, byteBuffer.position() + 1);
+			c = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
 		}
 
+		// drop 'e'
+		byteBuffer.get();
 		return result;
 	}
 
