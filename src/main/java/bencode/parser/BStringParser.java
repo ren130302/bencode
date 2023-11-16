@@ -19,6 +19,7 @@ public final class BStringParser implements IBValueParser<BString> {
 		StringBuffer strBuf = new StringBuffer();
 
 		int c = ByteBufferUtils.get(byteBuffer);
+
 		while (c != CORON) {
 			if (Character.isDigit(c)) {
 				strBuf.append((char) c);
@@ -28,11 +29,6 @@ public final class BStringParser implements IBValueParser<BString> {
 		}
 
 		int length = Integer.parseInt(strBuf.toString());
-
-		if (length < 0) {
-			length = 0;
-		}
-
 		final byte[] byteData = new byte[length];
 		byteBuffer.get(byteData);
 
