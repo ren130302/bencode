@@ -6,7 +6,7 @@ import lombok.Value;
 
 @Value(staticConstructor = "valueOf")
 @EqualsAndHashCode(callSuper = false)
-public final class BInteger extends Number implements BValue<Integer>, Comparable<BInteger> {
+public final class BInteger extends Number implements BValue<Long>, Comparable<BInteger> {
 
 	private static final long serialVersionUID = 4188918941802769935L;
 
@@ -14,14 +14,14 @@ public final class BInteger extends Number implements BValue<Integer>, Comparabl
 		return BInteger.valueOf(value.longValue());
 	}
 
-	private final @NonNull Integer value;
+	private final @NonNull Long value;
 
 	@Override
 	public BInteger clone() {
 		try {
 			return (BInteger) super.clone();
 		} catch (CloneNotSupportedException cnse) {
-			final BInteger result = valueOf(Integer.valueOf(this.value));
+			final BInteger result = valueOf(Long.valueOf(this.value));
 
 			return result;
 		}

@@ -24,16 +24,14 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 
 		StringBuffer strBuf = new StringBuffer();
 
-		c = ByteBufferUtils.get(byteBuffer);
+		c = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
 
-		while (c != END) {
-			if (c == NEGA || Character.isDigit(c)) {
-				strBuf.append((char) c);
-			}
+		while (c != END && (c == NEGA || Character.isDigit(c))) {
+			strBuf.append((char) c);
 			c = ByteBufferUtils.get(byteBuffer);
 		}
 
-		int number = Integer.parseInt(strBuf.toString());
+		long number = Long.parseLong(strBuf.toString());
 
 		return BInteger.valueOf(number);
 	}

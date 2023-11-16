@@ -20,11 +20,8 @@ public final class BStringParser implements IBValueParser<BString> {
 
 		int c = ByteBufferUtils.get(byteBuffer);
 
-		while (c != CORON) {
-			if (Character.isDigit(c)) {
-				strBuf.append((char) c);
-
-			}
+		while (c != CORON && Character.isDigit(c)) {
+			strBuf.append((char) c);
 			c = ByteBufferUtils.get(byteBuffer);
 		}
 
