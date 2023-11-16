@@ -16,33 +16,27 @@ public final class BStringParser implements IBValueParser<BString> {
 
 	@Override
 	public BString readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
-		int from = byteBuffer.position();
+		StringBuffer strBuf = new StringBuffer();
 
 		int c = ByteBufferUtils.get(byteBuffer);
-
 		while (c != CORON) {
-			if (!byteBuffer.hasRemaining()) {
-				throw new IllegalArgumentException("Expected ':', not '" + (char) c + "'");
+			if (Character.isDigit(c)) {
+				strBuf.append((char) c);
+
 			}
 			c = ByteBufferUtils.get(byteBuffer);
 		}
-		int to = byteBuffer.position() - 1;
-		int length = Integer.parseInt(new String(ByteBufferUtils.slice(byteBuffer, from, to), this.getCharset()));
+
+		int length = Integer.parseInt(strBuf.toString());
 
 		if (length < 0) {
-			throw new IllegalArgumentException("Expected negetive value, not " + length + "");
+			length = 0;
 		}
 
-		from = byteBuffer.position();
-		to = from + length;
+		final byte[] byteData = new byte[length];
+		byteBuffer.get(byteData);
 
-		if (byteBuffer.capacity() <= to) {
-			to = byteBuffer.capacity();
-		}
-
-		byteBuffer.position(to);
-
-		return BString.valueOf(ByteBufferUtils.slice(byteBuffer, from, to));
+		return BString.valueOf(byteData);
 	}
 
 	@Override

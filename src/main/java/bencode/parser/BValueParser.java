@@ -30,7 +30,7 @@ public final class BValueParser implements IBValueParser<BValue<?>> {
 			return this.getParsers().getBDictionaryParser().readFromByteBuffer(byteBuffer);
 		}
 
-		throw ByteBufferUtils.createUnknownValueType();
+		throw ByteBufferUtils.createUnknownValueType((char) indicator);
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public final class BValueParser implements IBValueParser<BValue<?>> {
 			return this.getParsers().getBDictionaryParser().writeToByteBuffer(v);
 		}
 
-		throw ByteBufferUtils.createUnknownValueType();
+		throw ByteBufferUtils.createUnknownValueType(value.getClass());
 	}
 
 }

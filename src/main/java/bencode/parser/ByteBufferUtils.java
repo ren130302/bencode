@@ -3,32 +3,39 @@ package bencode.parser;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
-class ByteBufferUtils {
-	static int get(ByteBuffer byteBuffer) throws EOFException {
+public class ByteBufferUtils {
+	public static int get(ByteBuffer byteBuffer) throws EOFException {
 		hasRemaining(byteBuffer);
 
-		return Byte.toUnsignedInt(byteBuffer.get());
+		int indicator = Byte.toUnsignedInt(byteBuffer.get());
+		return indicator;
 	}
 
-	static int get(ByteBuffer byteBuffer, int index) throws IOException {
+	public static int get(ByteBuffer byteBuffer, int index) throws IOException {
 		hasRemaining(byteBuffer);
 
-		return Byte.toUnsignedInt(byteBuffer.get(index));
+		int indicator = Byte.toUnsignedInt(byteBuffer.get(index));
+
+		return indicator;
 	}
 
-	static void hasRemaining(ByteBuffer byteBuffer) throws EOFException {
+	public static void hasRemaining(ByteBuffer byteBuffer) throws EOFException {
 		if (!byteBuffer.hasRemaining()) {
-			throw new EOFException();
+			throw new EOFException("" + byteBuffer);
 		}
 	}
 
-	static IllegalArgumentException createUnknownValueType() {
-		return new IllegalArgumentException("Unknown value type.");
+	public static IllegalArgumentException createUnknownValueType(Object obj) {
+		return new IllegalArgumentException("Unknown value type. " + obj);
 	}
 
-	static byte[] slice(ByteBuffer byteBuffer, int from, int to) {
-		return Arrays.copyOfRange(byteBuffer.array(), from, to);
+	public static void validateCode(ByteBuffer byteBuffer, char code) throws IOException {
+		int c = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
+
+		if (c != code) {
+			throw new IllegalArgumentException("Expected '" + code + "', not '" + (char) c + "'");
+		}
 	}
+
 }

@@ -9,7 +9,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "create")
-public final class BDictionary implements BValue<Map<String, BValue<?>>>, Map<String, BValue<?>> {
+public final class BDictionary implements BValue<Map<BString, BValue<?>>>, Map<BString, BValue<?>> {
 
 	private static final long serialVersionUID = -7574359365654348201L;
 
@@ -17,7 +17,7 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>>, Map<St
 		return create(new TreeMap<>());
 	}
 
-	private final @NonNull Map<String, BValue<?>> value;
+	private final @NonNull Map<BString, BValue<?>> value;
 
 	@Override
 	public BDictionary clone() {
@@ -35,9 +35,7 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>>, Map<St
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append('{');
 		buffer.append(String.join(", ",
-				this.getValue().entrySet().stream()
-						.map(entry -> BString.valueOf(entry.getKey()).toString() + ":" + entry.getValue().toString())
-						.toList()));
+				this.getValue().entrySet().stream().map(entry -> entry.getKey() + ":" + entry.getValue()).toList()));
 		buffer.append('}');
 		return buffer.toString();
 	}
@@ -58,23 +56,17 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>>, Map<St
 	}
 
 	@Override
-	public Set<Entry<String, BValue<?>>> entrySet() {
+	public Set<Entry<BString, BValue<?>>> entrySet() {
 		return this.getValue().entrySet();
-	}
-
-	public Set<Entry<BString, BValue<?>>> entrySetConverted() {
-		final Map<BString, BValue<?>> result = new TreeMap<>();
-
-		for (Entry<String, BValue<?>> entry : this.getValue().entrySet()) {
-			result.put(BString.valueOf(entry.getKey()), entry.getValue());
-		}
-
-		return result.entrySet();
 	}
 
 	@Override
 	public BValue<?> get(Object key) {
 		return this.getValue().get(key);
+	}
+
+	public BValue<?> get(String key) {
+		return this.getValue().get(BString.valueOf(key));
 	}
 
 	public BDictionary getBDictionary(String key) {
@@ -99,17 +91,21 @@ public final class BDictionary implements BValue<Map<String, BValue<?>>>, Map<St
 	}
 
 	@Override
-	public Set<String> keySet() {
+	public Set<BString> keySet() {
 		return this.getValue().keySet();
 	}
 
 	@Override
-	public BValue<?> put(String key, BValue<?> value) {
+	public BValue<?> put(BString key, BValue<?> value) {
 		return this.getValue().put(key, value);
 	}
 
+	public BValue<?> put(String key, BValue<?> value) {
+		return this.getValue().put(BString.valueOf(key), value);
+	}
+
 	@Override
-	public void putAll(Map<? extends String, ? extends BValue<?>> m) {
+	public void putAll(Map<? extends BString, ? extends BValue<?>> m) {
 		this.getValue().putAll(m);
 	}
 

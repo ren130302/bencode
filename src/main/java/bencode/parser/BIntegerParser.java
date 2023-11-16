@@ -22,18 +22,16 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 			throw new IllegalArgumentException("Expected 'i', not '" + (char) c + "'");
 		}
 
-		int from = byteBuffer.position();
+		StringBuffer strBuf = new StringBuffer();
 
 		c = ByteBufferUtils.get(byteBuffer);
 
 		while (c != END) {
-			if (!byteBuffer.hasRemaining()) {
-				throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
-			}
+			strBuf.append((char) c);
 			c = ByteBufferUtils.get(byteBuffer);
 		}
-		int to = byteBuffer.position() - 1;
-		int number = Integer.parseInt(new String(ByteBufferUtils.slice(byteBuffer, from, to), this.getCharset()));
+
+		int number = Integer.parseInt(strBuf.toString());
 
 		return BInteger.valueOf(number);
 	}

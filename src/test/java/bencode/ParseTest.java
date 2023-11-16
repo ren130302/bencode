@@ -1,8 +1,9 @@
 package bencode;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -23,30 +24,9 @@ public class ParseTest {
 
 	@Test
 	public void test() throws IOException {
+//		this.assertTorrent("bittorrent-v2-test.torrent");
+//		this.assertTorrent("bittorrent-v2-hybrid-test.torrent");
 
-		try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream("bittorrent-v2-test.torrent")) {
-//			log.fine(text);
-			BDictionary desirialized = this.valueParsers.getBDictionaryParser()
-					.readFromByteBuffer(ByteBuffer.wrap(inputStream.readAllBytes()));
-//			log.fine("" + desirialized);
-			System.out.println(desirialized);
-			ByteBuffer serialized = this.valueParsers.getBDictionaryParser().writeToByteBuffer(desirialized);
-//			log.fine(serialized);
-			System.out.println(serialized);
-		}
-
-		try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream("bittorrent-v2-hybrid-test.torrent")) {
-//			log.fine(text);
-			BDictionary desirialized = this.valueParsers.getBDictionaryParser()
-					.readFromByteBuffer(ByteBuffer.wrap(inputStream.readAllBytes()));
-//			log.fine("" + desirialized);
-			System.out.println(desirialized);
-			ByteBuffer serialized = this.valueParsers.getBDictionaryParser().writeToByteBuffer(desirialized);
-//			log.fine(serialized);
-			System.out.println(serialized);
-		}
 		BString bString = BString.valueOf("text");
 		this.assertBValue(bString);
 		this.assertBString(bString);
@@ -71,9 +51,25 @@ public class ParseTest {
 		this.assertBValue(bDictEmpty);
 		this.assertBDictionary(bDictEmpty);
 
-		BDictionary bDict = BDictionary.create(Map.of());
+		BDictionary bDict = BDictionary.create();
+		bDict.put("bStr", bString);
+		bDict.put("bInt", bInteger);
+		bDict.put("bList", bList);
+		bDict.put("bDict", bDictEmpty);
 		this.assertBValue(bDict);
 		this.assertBDictionary(bDict);
+	}
+
+	private void assertTorrent(String filename) throws IOException {
+		final byte[] data;
+		try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(filename)) {
+			data = inputStream.readAllBytes();
+		}
+		BDictionary desirialized = this.valueParsers.getBDictionaryParser().readFromBytes(data);
+		System.out.println(desirialized);
+		String serialized = this.valueParsers.getBDictionaryParser().writeToString(desirialized);
+		System.out.println(serialized);
+		assertEquals(data, serialized);
 	}
 
 	private void assertBValue(BValue<?> bValue) throws IOException {

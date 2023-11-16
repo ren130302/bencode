@@ -2,9 +2,7 @@ package bencode.parser;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import bencode.BDictionary;
@@ -27,7 +25,7 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 			throw new IllegalArgumentException("Expected 'd', not '" + (char) c + "'");
 		}
 
-		final Map<String, BValue<?>> map = new TreeMap<>();
+		final BDictionary result = BDictionary.create();
 
 		BString key = null;
 		BValue<?> value = null;
@@ -35,19 +33,15 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 		c = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
 
 		while (c != END) {
-			if (!byteBuffer.hasRemaining()) {
-				throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
-			}
-
 			key = this.parsers.getBStringParser().readFromByteBuffer(byteBuffer);
 			value = this.parsers.getBValueParser().readFromByteBuffer(byteBuffer);
 
-			map.put(key.getString(), value);
+			result.put(key.getString(), value);
 
-			c = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
+			c = ByteBufferUtils.get(byteBuffer, byteBuffer.position() + 1);
 		}
 
-		return BDictionary.create(map);
+		return result;
 	}
 
 	@Override
@@ -56,8 +50,8 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 
 		buffer.append(DICTIONARY);
 
-		for (Entry<String, BValue<?>> entry : value.entrySet()) {
-			buffer.append(this.parsers.getBStringParser().writeToString(BString.valueOf(entry.getKey())));
+		for (Entry<BString, BValue<?>> entry : value.entrySet()) {
+			buffer.append(this.parsers.getBStringParser().writeToString(entry.getKey()));
 			buffer.append(this.parsers.getBValueParser().writeToString(entry.getValue()));
 		}
 

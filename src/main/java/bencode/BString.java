@@ -74,12 +74,12 @@ public final class BString implements BValue<Byte[]>, Comparable<BString> {
 
 	@Override
 	public int compareTo(BString that) {
-		final int thisLength = this.getValue().length;
-		final int thatLength = that.getValue().length;
+		final int thisLength = this.value.length;
+		final int thatLength = that.value.length;
 
 		if (thisLength == thatLength) {
 			for (int index = 0; index < thisLength && index < thatLength; index++) {
-				int sum = Byte.toUnsignedInt(this.getValue()[index]) - Byte.toUnsignedInt(that.getValue()[index]);
+				int sum = Byte.toUnsignedInt(this.value[index]) - Byte.toUnsignedInt(that.value[index]);
 
 				if (sum != 0) {
 					return sum;
@@ -90,12 +90,16 @@ public final class BString implements BValue<Byte[]>, Comparable<BString> {
 		return thisLength - thatLength;
 	}
 
+	public byte[] get() {
+		return autoboxing(this.value);
+	}
+
 	public String getString() {
-		return new String(autoboxing(this.getValue()));
+		return new String(this.get());
 	}
 
 	public String getString(Charset charset) {
-		return new String(autoboxing(this.getValue()), charset);
+		return new String(this.get(), charset);
 	}
 
 }

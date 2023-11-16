@@ -2,8 +2,6 @@ package bencode.parser;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import bencode.BList;
@@ -25,22 +23,19 @@ public final class BListParser implements IBValueParser<BList> {
 			throw new IllegalArgumentException("Expected 'l', not '" + (char) c + "'");
 		}
 
-		final List<BValue<?>> list = new ArrayList<>();
+		final BList result = BList.create();
 
 		BValue<?> value = null;
+
 		c = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
 
 		while (c != END) {
-			if (!byteBuffer.hasRemaining()) {
-				throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
-			}
-
 			value = this.parsers.getBValueParser().readFromByteBuffer(byteBuffer);
-			list.add(value);
-			c = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
-		}
+			result.add(value);
 
-		final BList result = BList.create(list);
+			c = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
+			System.out.println((char) c);
+		}
 
 		return result;
 	}
