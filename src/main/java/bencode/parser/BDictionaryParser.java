@@ -34,8 +34,8 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 
 		while (c != END) {
 			key = this.parsers.getBStringParser().readFromByteBuffer(byteBuffer);
-			value = this.parsers.getBValueParser().readFromByteBuffer(byteBuffer);
 
+			value = this.parsers.getBValueParser().readFromByteBuffer(byteBuffer);
 			result.put(key.getString(), value);
 
 			c = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
@@ -47,7 +47,7 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 	}
 
 	@Override
-	public ByteBuffer writeToByteBuffer(BDictionary value) throws IOException {
+	public String writeToString(BDictionary value) throws IOException {
 		final StringBuffer buffer = new StringBuffer();
 
 		buffer.append(DICTIONARY);
@@ -59,7 +59,7 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 
 		buffer.append(END);
 
-		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
+		return buffer.toString();
 	}
 
 }

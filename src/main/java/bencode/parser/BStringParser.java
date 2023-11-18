@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.util.regex.Pattern;
 
 import bencode.BString;
+import lombok.NonNull;
 import lombok.Value;
 
 @Value
@@ -33,14 +34,14 @@ public final class BStringParser implements IBValueParser<BString> {
 	}
 
 	@Override
-	public ByteBuffer writeToByteBuffer(BString value) throws IOException {
+	public String writeToString(@NonNull BString value) throws IOException {
 		final StringBuffer buffer = new StringBuffer();
 
 		buffer.append(value.getValue().length);
 		buffer.append(CORON);
 		buffer.append(value.getString(this.getCharset()));
 
-		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
+		return buffer.toString();
 	}
 
 }

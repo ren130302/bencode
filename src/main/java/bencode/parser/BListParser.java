@@ -42,7 +42,7 @@ public final class BListParser implements IBValueParser<BList> {
 	}
 
 	@Override
-	public ByteBuffer writeToByteBuffer(BList value) throws IOException {
+	public String writeToString(BList value) throws IOException {
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(LIST);
 
@@ -52,7 +52,7 @@ public final class BListParser implements IBValueParser<BList> {
 
 		buffer.append(END);
 
-		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
+		return buffer.toString();
 	}
 
 }

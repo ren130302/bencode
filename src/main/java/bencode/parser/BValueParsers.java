@@ -4,18 +4,14 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import bencode.BDictionary;
-import bencode.BInteger;
-import bencode.BList;
-import bencode.BString;
-import bencode.BValue;
+import lombok.NonNull;
 import lombok.Value;
 
 @Value
 public final class BValueParsers {
 
 	private final Charset charset;
-	private final Map<Class<?>, IBValueParser<?>> knownParsers = new HashMap<>();
+	private final Map<Class<? extends IBValueParser<?>>, IBValueParser<?>> knownParsers = new HashMap<>();
 
 	public BValueParsers() {
 		this.charset = Charset.defaultCharset();
@@ -28,30 +24,43 @@ public final class BValueParsers {
 	}
 
 	private void init() {
-		this.knownParsers.put(BValue.class, new BValueParser(this));
-		this.knownParsers.put(BDictionary.class, new BDictionaryParser(this));
-		this.knownParsers.put(BList.class, new BListParser(this));
-		this.knownParsers.put(BInteger.class, new BIntegerParser(this));
-		this.knownParsers.put(BString.class, new BStringParser(this));
+		this.register(BValueParser.class);
+		this.register(BDictionaryParser.class);
+		this.register(BListParser.class);
+		this.register(BIntegerParser.class);
+		this.register(BStringParser.class);
+	}
+
+	private void register(@NonNull Class<? extends IBValueParser<?>> cls) {
+		try {
+			this.knownParsers.put(cls, cls.getDeclaredConstructor(this.getClass()).newInstance(this));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T extends IBValueParser<?>> T get(@NonNull Class<T> cls) {
+		return (T) this.knownParsers.get(cls);
 	}
 
 	public BValueParser getBValueParser() {
-		return (BValueParser) this.knownParsers.get(BValue.class);
+		return this.get(BValueParser.class);
 	}
 
 	public BDictionaryParser getBDictionaryParser() {
-		return (BDictionaryParser) this.knownParsers.get(BDictionary.class);
+		return this.get(BDictionaryParser.class);
 	}
 
 	public BListParser getBListParser() {
-		return (BListParser) this.knownParsers.get(BList.class);
+		return this.get(BListParser.class);
 	}
 
 	public BIntegerParser getBIntegerParser() {
-		return (BIntegerParser) this.knownParsers.get(BInteger.class);
+		return this.get(BIntegerParser.class);
 	}
 
 	public BStringParser getBStringParser() {
-		return (BStringParser) this.knownParsers.get(BString.class);
+		return this.get(BStringParser.class);
 	}
 }

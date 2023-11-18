@@ -34,18 +34,18 @@ public final class BValueParser implements IBValueParser<BValue<?>> {
 	}
 
 	@Override
-	public ByteBuffer writeToByteBuffer(BValue<?> value) throws IOException {
+	public String writeToString(BValue<?> value) throws IOException {
 		if (value instanceof BString v) {
-			return this.getParsers().getBStringParser().writeToByteBuffer(v);
+			return this.getParsers().getBStringParser().writeToString(v);
 		}
 		if (value instanceof BInteger v) {
-			return this.getParsers().getBIntegerParser().writeToByteBuffer(v);
+			return this.getParsers().getBIntegerParser().writeToString(v);
 		}
 		if (value instanceof BList v) {
-			return this.getParsers().getBListParser().writeToByteBuffer(v);
+			return this.getParsers().getBListParser().writeToString(v);
 		}
 		if (value instanceof BDictionary v) {
-			return this.getParsers().getBDictionaryParser().writeToByteBuffer(v);
+			return this.getParsers().getBDictionaryParser().writeToString(v);
 		}
 
 		throw ByteBufferUtils.createUnknownValueType(value.getClass());

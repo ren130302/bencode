@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.util.regex.Pattern;
 
 import bencode.BInteger;
+import lombok.NonNull;
 import lombok.Value;
 
 @Value
@@ -24,10 +25,11 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 
 		StringBuffer strBuf = new StringBuffer();
 
-		c = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
+		while (c != END) {
 
-		while (c != END && (c == NEGA || Character.isDigit(c))) {
-			strBuf.append((char) c);
+			if ((c == NEGA || Character.isDigit(c))) {
+				strBuf.append((char) c);
+			}
 			c = ByteBufferUtils.get(byteBuffer);
 		}
 
@@ -37,13 +39,13 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 	}
 
 	@Override
-	public ByteBuffer writeToByteBuffer(BInteger value) throws IOException {
+	public String writeToString(@NonNull BInteger value) throws IOException {
 		final StringBuffer buffer = new StringBuffer();
 
 		buffer.append(INTEGER);
 		buffer.append(value.longValue());
 		buffer.append(END);
 
-		return ByteBuffer.wrap(buffer.toString().getBytes(this.getCharset()));
+		return buffer.toString();
 	}
 }
