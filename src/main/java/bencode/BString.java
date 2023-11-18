@@ -2,6 +2,7 @@ package bencode;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Objects;
 
 import lombok.NonNull;
@@ -65,10 +66,16 @@ public final class BString implements BValue<Byte[]>, Comparable<BString> {
 	public String toString() {
 		final StringBuffer buffer = new StringBuffer();
 
-		buffer.append('\"');
-		buffer.append(this.getString());
-		buffer.append('\"');
-
+		if (Arrays.asList(this.getValue()).stream().anyMatch(v -> v < 0)) {
+			buffer.append('[');
+			buffer.append(
+					String.join(",", Arrays.asList(this.getValue()).stream().map(v -> Byte.toString(v)).toList()));
+			buffer.append(']');
+		} else {
+			buffer.append('\"');
+			buffer.append(this.getString());
+			buffer.append('\"');
+		}
 		return buffer.toString();
 	}
 
@@ -100,6 +107,10 @@ public final class BString implements BValue<Byte[]>, Comparable<BString> {
 
 	public String getString(Charset charset) {
 		return new String(this.get(), charset);
+	}
+
+	public byte[] getLength(Charset charset) {
+		return Integer.toString(this.value.length).getBytes(charset);
 	}
 
 }
