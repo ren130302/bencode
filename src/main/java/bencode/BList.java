@@ -11,22 +11,23 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "create")
-public final class BList implements BValue<List<BValue<?>>>, List<BValue<?>> {
+public final class BList<T extends BValue<?>> implements BValue<List<T>>, List<T> {
 
 	private static final long serialVersionUID = 1551379075504078235L;
 
-	public static BList create() {
+	public static <T extends BValue<?>> BList<T> create() {
 		return create(new ArrayList<>());
 	}
 
-	private final @NonNull List<BValue<?>> value;
+	private final @NonNull List<T> value;
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public BList clone() {
+	public BList<T> clone() {
 		try {
-			return (BList) super.clone();
+			return (BList<T>) super.clone();
 		} catch (CloneNotSupportedException cnse) {
-			final BList result = create(new ArrayList<>(this.value));
+			final BList<T> result = create(new ArrayList<>(this.value));
 
 			return result;
 		}
@@ -42,23 +43,13 @@ public final class BList implements BValue<List<BValue<?>>>, List<BValue<?>> {
 	}
 
 	@Override
-	public boolean add(BValue<?> e) {
+	public boolean add(T e) {
 		return this.getValue().add(e);
 	}
 
 	@Override
-	public void add(int index, BValue<?> element) {
+	public void add(int index, T element) {
 		this.getValue().add(index, element);
-	}
-
-	@Override
-	public boolean addAll(Collection<? extends BValue<?>> c) {
-		return this.getValue().addAll(c);
-	}
-
-	@Override
-	public boolean addAll(int index, Collection<? extends BValue<?>> c) {
-		return this.getValue().addAll(index, c);
 	}
 
 	@Override
@@ -72,24 +63,8 @@ public final class BList implements BValue<List<BValue<?>>>, List<BValue<?>> {
 	}
 
 	@Override
-	public BValue<?> get(int index) {
+	public T get(int index) {
 		return this.getValue().get(index);
-	}
-
-	public BDictionary getBDictionary(int index) {
-		return (BDictionary) this.get(index);
-	}
-
-	public BInteger getBInteger(int index) {
-		return (BInteger) this.get(index);
-	}
-
-	public BList getBList(int index) {
-		return (BList) this.get(index);
-	}
-
-	public BString getBString(int index) {
-		return (BString) this.get(index);
 	}
 
 	@Override
@@ -103,7 +78,7 @@ public final class BList implements BValue<List<BValue<?>>>, List<BValue<?>> {
 	}
 
 	@Override
-	public Iterator<BValue<?>> iterator() {
+	public Iterator<T> iterator() {
 		return this.getValue().iterator();
 	}
 
@@ -113,12 +88,12 @@ public final class BList implements BValue<List<BValue<?>>>, List<BValue<?>> {
 	}
 
 	@Override
-	public ListIterator<BValue<?>> listIterator() {
+	public ListIterator<T> listIterator() {
 		return this.getValue().listIterator();
 	}
 
 	@Override
-	public ListIterator<BValue<?>> listIterator(int index) {
+	public ListIterator<T> listIterator(int index) {
 		return this.getValue().listIterator(index);
 	}
 
@@ -128,12 +103,12 @@ public final class BList implements BValue<List<BValue<?>>>, List<BValue<?>> {
 	}
 
 	@Override
-	public BValue<?> remove(int index) {
+	public T remove(int index) {
 		return this.getValue().remove(index);
 	}
 
 	@Override
-	public BValue<?> set(int index, BValue<?> element) {
+	public T set(int index, T element) {
 		return this.getValue().set(index, element);
 	}
 
@@ -143,12 +118,12 @@ public final class BList implements BValue<List<BValue<?>>>, List<BValue<?>> {
 	}
 
 	@Override
-	public Stream<BValue<?>> stream() {
+	public Stream<T> stream() {
 		return this.getValue().stream();
 	}
 
 	@Override
-	public List<BValue<?>> subList(int fromIndex, int toIndex) {
+	public List<T> subList(int fromIndex, int toIndex) {
 		return this.getValue().subList(fromIndex, toIndex);
 	}
 
@@ -158,7 +133,7 @@ public final class BList implements BValue<List<BValue<?>>>, List<BValue<?>> {
 	}
 
 	@Override
-	public <T> T[] toArray(T[] a) {
+	public <Z> Z[] toArray(Z[] a) {
 		return this.getValue().toArray(a);
 	}
 
@@ -175,5 +150,15 @@ public final class BList implements BValue<List<BValue<?>>>, List<BValue<?>> {
 	@Override
 	public boolean retainAll(Collection<?> c) {
 		return this.getValue().retainAll(c);
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends T> c) {
+		return this.getValue().addAll(c);
+	}
+
+	@Override
+	public boolean addAll(int index, Collection<? extends T> c) {
+		return this.getValue().addAll(index, c);
 	}
 }
