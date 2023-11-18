@@ -9,21 +9,21 @@ import bencode.BValue;
 import lombok.Value;
 
 @Value
-public final class BListParser implements IBValueParser<BList> {
+public final class BListParser implements IBValueParser<BList<?>> {
 
 	public static final Pattern PATTERN = Pattern.compile("(?sm)^l(?<items>.*)e$");
 
 	private final BValueParsers parsers;
 
 	@Override
-	public BList readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
+	public BList<?> readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
 		int c = ByteBufferUtils.get(byteBuffer);
 
 		if (c != LIST) {
 			throw new IllegalArgumentException("Expected 'l', not '" + (char) c + "'");
 		}
 
-		final BList result = BList.create();
+		final BList<BValue<?>> result = BList.create();
 
 		BValue<?> value = null;
 
@@ -36,13 +36,17 @@ public final class BListParser implements IBValueParser<BList> {
 			c = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
 		}
 		// drop 'e'
-		byteBuffer.get();
+		c = byteBuffer.get();
+
+		if (c != END) {
+			throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
+		}
 
 		return result;
 	}
 
 	@Override
-	public String writeToString(BList value) throws IOException {
+	public String writeToString(BList<?> value) throws IOException {
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(LIST);
 

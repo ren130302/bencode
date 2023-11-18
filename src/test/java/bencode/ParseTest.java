@@ -4,9 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,58 +21,29 @@ import bencode.parser.BValueParsers;
 public class ParseTest {
 	private final BValueParsers valueParsers = new BValueParsers(StandardCharsets.UTF_8);
 
-//	@Test
-	public void test() throws IOException {
-		BString bString = BString.valueOf("text");
-		this.assertBValue(bString);
-		this.assertBString(bString);
-
-		BString bStringEmpty = BString.valueOf("");
-		this.assertBValue(bStringEmpty);
-		this.assertBString(bStringEmpty);
-
-		BInteger bInteger = BInteger.valueOf(100);
-		this.assertBValue(bInteger);
-		this.assertBInteger(bInteger);
-
-		BList bListEmpty = BList.create(List.of());
-		this.assertBValue(bListEmpty);
-		this.assertBList(bListEmpty);
-
-		BList bList = BList.create(List.of(bInteger, bInteger, bInteger, bInteger, bInteger));
-		this.assertBValue(bList);
-		this.assertBList(bList);
-
-		BDictionary bDictEmpty = BDictionary.create(Map.of());
-		this.assertBValue(bDictEmpty);
-		this.assertBDictionary(bDictEmpty);
-
-		BDictionary bDict = BDictionary.create();
-		bDict.put("bStr", bString);
-		bDict.put("bInt", bInteger);
-		bDict.put("bList", bList);
-		bDict.put("bDict", bDictEmpty);
-		this.assertBValue(bDict);
-		this.assertBDictionary(bDict);
-	}
-
 	@Test
 	public void torrent() throws IOException {
 		this.assertTorrent("bittorrent-v2-test.torrent");
 		this.assertTorrent("bittorrent-v2-hybrid-test.torrent");
-		int i = Integer.MAX_VALUE;
 	}
 
 	private void assertTorrent(String filename) throws IOException {
-		final byte[] data;
+		final ByteBuffer data;
 		try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(filename)) {
-			data = inputStream.readAllBytes();
+			data = ByteBuffer.wrap(inputStream.readAllBytes());
 		}
-		BDictionary desirialized = this.valueParsers.getBDictionaryParser().readFromBytes(data);
-		String serialized = this.valueParsers.getBDictionaryParser().writeToString(desirialized);
-		System.out.println(serialized);
+		BDictionary desirialized = this.valueParsers.getBDictionaryParser().readFromByteBuffer(data);
+		ByteBuffer serialized = this.valueParsers.getBDictionaryParser().writeToByteBuffer(desirialized);
 
-		assertEquals(data.length, serialized.getBytes().length);
+//		BDictionary desirialized2 = this.valueParsers.getBDictionaryParser().readFromByteBuffer(serialized);
+//		System.out.println(data);
+//		System.out.println(serialized);
+		BDictionary desirialized2 = this.valueParsers.getBDictionaryParser().readFromByteBuffer(serialized);
+		ByteBuffer serialized2 = this.valueParsers.getBDictionaryParser().writeToByteBuffer(desirialized2);
+//		System.out.println(serialized);
+//		System.out.println(serialized2);
+
+		assertEquals(desirialized.toString(), desirialized2.toString());
 	}
 
 	private void assertBValue(BValue<?> bValue) throws IOException {

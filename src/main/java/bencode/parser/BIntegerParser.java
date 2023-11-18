@@ -33,6 +33,10 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 			c = ByteBufferUtils.get(byteBuffer);
 		}
 
+		if (c != END) {
+			throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
+		}
+
 		long number = Long.parseLong(strBuf.toString());
 
 		return BInteger.valueOf(number);

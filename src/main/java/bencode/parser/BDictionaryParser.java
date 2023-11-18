@@ -34,15 +34,19 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 
 		while (c != END) {
 			key = this.parsers.getBStringParser().readFromByteBuffer(byteBuffer);
-
 			value = this.parsers.getBValueParser().readFromByteBuffer(byteBuffer);
-			result.put(key.getString(), value);
+			result.put(key, value);
 
 			c = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
 		}
 
 		// drop 'e'
-		byteBuffer.get();
+		c = byteBuffer.get();
+
+		if (c != END) {
+			throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
+		}
+
 		return result;
 	}
 
