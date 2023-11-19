@@ -35,13 +35,4 @@ public final class BList<T extends BValue<?>> extends ArrayList<T> implements BV
 		return (BList<T>) super.clone();
 	}
 
-	@Override
-	public String toString() {
-		final StringBuffer buffer = new StringBuffer();
-		buffer.append('[');
-		buffer.append(String.join(", ", this.getValue().stream().map(BValue::toString).toList()));
-		buffer.append(']');
-		return buffer.toString();
-	}
-
 }

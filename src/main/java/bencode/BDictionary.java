@@ -33,16 +33,6 @@ public final class BDictionary extends LinkedHashMap<BString, BValue<?>> impleme
 		return (BDictionary) super.clone();
 	}
 
-	@Override
-	public String toString() {
-		final StringBuffer buffer = new StringBuffer();
-		buffer.append('{');
-		buffer.append(String.join(", ",
-				this.getValue().entrySet().stream().map(entry -> entry.getKey() + ":" + entry.getValue()).toList()));
-		buffer.append('}');
-		return buffer.toString();
-	}
-
 	public BValue<?> get(String key) {
 		return this.getValue().get(BString.valueOf(key));
 	}

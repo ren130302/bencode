@@ -40,8 +40,7 @@ public final class BInteger extends Number implements BValue<Long>, Comparable<B
 
 	@Override
 	public String toString() {
-		final StringBuffer buffer = new StringBuffer();
-		return buffer.append(this.getValue()).toString();
+		return Long.toString(this.getValue());
 	}
 
 	@Override

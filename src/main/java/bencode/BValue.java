@@ -4,12 +4,12 @@ import java.io.Serializable;
 
 public interface BValue<T> extends Serializable, Cloneable {
 
+	T getValue();
+
 	BValue<T> clone();
 
 	@Override
 	boolean equals(Object obj);
-
-	T getValue();
 
 	@Override
 	int hashCode();

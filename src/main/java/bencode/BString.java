@@ -76,13 +76,7 @@ public final class BString implements BValue<Byte[]>, Comparable<BString> {
 
 	@Override
 	public String toString() {
-		final StringBuffer buffer = new StringBuffer();
-
-		buffer.append('\"');
-		buffer.append(this.getString());
-		buffer.append('\"');
-
-		return buffer.toString();
+		return this.getString();
 	}
 
 	@Override
