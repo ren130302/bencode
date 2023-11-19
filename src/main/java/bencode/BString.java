@@ -2,13 +2,12 @@ package bencode;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Objects;
 
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.Value;
 
-@Value(staticConstructor = "valueOf")
+@EqualsAndHashCode
 public final class BString implements BValue<Byte[]>, Comparable<BString> {
 
 	private static final long serialVersionUID = 2812347755822710497L;
@@ -33,10 +32,6 @@ public final class BString implements BValue<Byte[]>, Comparable<BString> {
 		return result;
 	}
 
-	public static BString valueOf(byte[] value) {
-		return valueOf(unboxing(value));
-	}
-
 	public static BString valueOf(String value) {
 		return valueOf(Objects.requireNonNullElse(value, "").getBytes());
 	}
@@ -49,7 +44,24 @@ public final class BString implements BValue<Byte[]>, Comparable<BString> {
 		return valueOf(Objects.requireNonNullElse(value, "").getBytes(encording));
 	}
 
+	public static BString valueOf(byte[] value) {
+		return new BString(unboxing(value));
+	}
+
+	public static BString valueOf(Byte[] value) {
+		return new BString(value);
+	}
+
 	private final @NonNull Byte[] value;
+
+	private BString(Byte[] value) {
+		this.value = value;
+	}
+
+	@Override
+	public Byte[] getValue() {
+		return this.value;
+	}
 
 	@Override
 	public BString clone() {
@@ -66,16 +78,10 @@ public final class BString implements BValue<Byte[]>, Comparable<BString> {
 	public String toString() {
 		final StringBuffer buffer = new StringBuffer();
 
-		if (Arrays.asList(this.getValue()).stream().anyMatch(v -> v < 0)) {
-			buffer.append('[');
-			buffer.append(
-					String.join(",", Arrays.asList(this.getValue()).stream().map(v -> Byte.toString(v)).toList()));
-			buffer.append(']');
-		} else {
-			buffer.append('\"');
-			buffer.append(this.getString());
-			buffer.append('\"');
-		}
+		buffer.append('\"');
+		buffer.append(this.getString());
+		buffer.append('\"');
+
 		return buffer.toString();
 	}
 

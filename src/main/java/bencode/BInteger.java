@@ -2,19 +2,30 @@ package bencode;
 
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.Value;
 
-@Value(staticConstructor = "valueOf")
 @EqualsAndHashCode(callSuper = false)
 public final class BInteger extends Number implements BValue<Long>, Comparable<BInteger> {
 
 	private static final long serialVersionUID = 4188918941802769935L;
 
 	public static BInteger valueOf(@NonNull Number value) {
-		return BInteger.valueOf(value.longValue());
+		return new BInteger(value.longValue());
+	}
+
+	public static BInteger valueOf(@NonNull Long value) {
+		return new BInteger(value);
 	}
 
 	private final @NonNull Long value;
+
+	private BInteger(Long value) {
+		this.value = value;
+	}
+
+	@Override
+	public Long getValue() {
+		return this.value;
+	}
 
 	@Override
 	public BInteger clone() {

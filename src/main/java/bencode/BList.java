@@ -2,35 +2,37 @@ package bencode;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.stream.Stream;
 
-import lombok.NonNull;
-import lombok.Value;
-
-@Value(staticConstructor = "create")
-public final class BList<T extends BValue<?>> implements BValue<List<T>>, List<T> {
+public final class BList<T extends BValue<?>> extends ArrayList<T> implements BValue<List<T>> {
 
 	private static final long serialVersionUID = 1551379075504078235L;
 
 	public static <T extends BValue<?>> BList<T> create() {
-		return create(new ArrayList<>());
+		return new BList<>();
 	}
 
-	private final @NonNull List<T> value;
+	public static <T extends BValue<?>> BList<T> create(Collection<T> c) {
+		return new BList<>(c);
+	}
+
+	private BList() {
+		super();
+	}
+
+	private BList(Collection<T> c) {
+		super(c);
+	}
+
+	@Override
+	public List<T> getValue() {
+		return this;
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public BList<T> clone() {
-		try {
-			return (BList<T>) super.clone();
-		} catch (CloneNotSupportedException cnse) {
-			final BList<T> result = create(new ArrayList<>(this.value));
-
-			return result;
-		}
+		return (BList<T>) super.clone();
 	}
 
 	@Override
@@ -42,123 +44,4 @@ public final class BList<T extends BValue<?>> implements BValue<List<T>>, List<T
 		return buffer.toString();
 	}
 
-	@Override
-	public boolean add(T e) {
-		return this.getValue().add(e);
-	}
-
-	@Override
-	public void add(int index, T element) {
-		this.getValue().add(index, element);
-	}
-
-	@Override
-	public void clear() {
-		this.getValue().clear();
-	}
-
-	@Override
-	public boolean contains(Object o) {
-		return this.getValue().contains(o);
-	}
-
-	@Override
-	public T get(int index) {
-		return this.getValue().get(index);
-	}
-
-	@Override
-	public int indexOf(Object o) {
-		return this.getValue().indexOf(o);
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return this.getValue().isEmpty();
-	}
-
-	@Override
-	public Iterator<T> iterator() {
-		return this.getValue().iterator();
-	}
-
-	@Override
-	public int lastIndexOf(Object o) {
-		return this.getValue().lastIndexOf(o);
-	}
-
-	@Override
-	public ListIterator<T> listIterator() {
-		return this.getValue().listIterator();
-	}
-
-	@Override
-	public ListIterator<T> listIterator(int index) {
-		return this.getValue().listIterator(index);
-	}
-
-	@Override
-	public boolean remove(Object o) {
-		return this.getValue().remove(o);
-	}
-
-	@Override
-	public T remove(int index) {
-		return this.getValue().remove(index);
-	}
-
-	@Override
-	public T set(int index, T element) {
-		return this.getValue().set(index, element);
-	}
-
-	@Override
-	public int size() {
-		return this.getValue().size();
-	}
-
-	@Override
-	public Stream<T> stream() {
-		return this.getValue().stream();
-	}
-
-	@Override
-	public List<T> subList(int fromIndex, int toIndex) {
-		return this.getValue().subList(fromIndex, toIndex);
-	}
-
-	@Override
-	public BValue<?>[] toArray() {
-		return (BValue[]) this.getValue().toArray();
-	}
-
-	@Override
-	public <Z> Z[] toArray(Z[] a) {
-		return this.getValue().toArray(a);
-	}
-
-	@Override
-	public boolean containsAll(Collection<?> c) {
-		return this.getValue().containsAll(c);
-	}
-
-	@Override
-	public boolean removeAll(Collection<?> c) {
-		return this.getValue().removeAll(c);
-	}
-
-	@Override
-	public boolean retainAll(Collection<?> c) {
-		return this.getValue().retainAll(c);
-	}
-
-	@Override
-	public boolean addAll(Collection<? extends T> c) {
-		return this.getValue().addAll(c);
-	}
-
-	@Override
-	public boolean addAll(int index, Collection<? extends T> c) {
-		return this.getValue().addAll(index, c);
-	}
 }

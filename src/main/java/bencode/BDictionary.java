@@ -1,33 +1,36 @@
 package bencode;
 
-import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
-import lombok.NonNull;
-import lombok.Value;
-
-@Value(staticConstructor = "create")
-public final class BDictionary implements BValue<Map<BString, BValue<?>>>, Map<BString, BValue<?>> {
+public final class BDictionary extends LinkedHashMap<BString, BValue<?>> implements BValue<Map<BString, BValue<?>>> {
 
 	private static final long serialVersionUID = -7574359365654348201L;
 
 	public static BDictionary create() {
-		return create(new TreeMap<>());
+		return new BDictionary();
 	}
 
-	private final @NonNull Map<BString, BValue<?>> value;
+	public static BDictionary create(Map<BString, BValue<?>> m) {
+		return new BDictionary(m);
+	}
+
+	private BDictionary() {
+		super();
+	}
+
+	private BDictionary(Map<BString, BValue<?>> m) {
+		super(m);
+	}
+
+	@Override
+	public Map<BString, BValue<?>> getValue() {
+		return this;
+	}
 
 	@Override
 	public BDictionary clone() {
-		try {
-			return (BDictionary) super.clone();
-		} catch (CloneNotSupportedException cnse) {
-			final BDictionary result = create(new TreeMap<>(this.value));
-
-			return result;
-		}
+		return (BDictionary) super.clone();
 	}
 
 	@Override
@@ -38,31 +41,6 @@ public final class BDictionary implements BValue<Map<BString, BValue<?>>>, Map<B
 				this.getValue().entrySet().stream().map(entry -> entry.getKey() + ":" + entry.getValue()).toList()));
 		buffer.append('}');
 		return buffer.toString();
-	}
-
-	@Override
-	public void clear() {
-		this.getValue().clear();
-	}
-
-	@Override
-	public boolean containsKey(Object key) {
-		return this.getValue().containsKey(key);
-	}
-
-	@Override
-	public boolean containsValue(Object value) {
-		return this.getValue().containsValue(value);
-	}
-
-	@Override
-	public Set<Entry<BString, BValue<?>>> entrySet() {
-		return this.getValue().entrySet();
-	}
-
-	@Override
-	public BValue<?> get(Object key) {
-		return this.getValue().get(key);
 	}
 
 	public BValue<?> get(String key) {
@@ -77,50 +55,16 @@ public final class BDictionary implements BValue<Map<BString, BValue<?>>>, Map<B
 		return (BInteger) this.get(key);
 	}
 
-	public BList getBList(String key) {
-		return (BList) this.get(key);
+	public BList<?> getBList(String key) {
+		return (BList<?>) this.get(key);
 	}
 
 	public BString getBString(String key) {
 		return (BString) this.get(key);
 	}
 
-	@Override
-	public boolean isEmpty() {
-		return this.getValue().isEmpty();
-	}
-
-	@Override
-	public Set<BString> keySet() {
-		return this.getValue().keySet();
-	}
-
-	@Override
-	public BValue<?> put(BString key, BValue<?> value) {
-		return this.getValue().put(key, value);
-	}
-
 	public BValue<?> put(String key, BValue<?> value) {
 		return this.getValue().put(BString.valueOf(key), value);
 	}
 
-	@Override
-	public void putAll(Map<? extends BString, ? extends BValue<?>> m) {
-		this.getValue().putAll(m);
-	}
-
-	@Override
-	public BValue<?> remove(Object key) {
-		return this.getValue().remove(key);
-	}
-
-	@Override
-	public int size() {
-		return this.getValue().size();
-	}
-
-	@Override
-	public Collection<BValue<?>> values() {
-		return this.getValue().values();
-	}
 }
