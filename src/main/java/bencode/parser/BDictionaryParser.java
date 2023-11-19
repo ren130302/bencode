@@ -1,5 +1,6 @@
 package bencode.parser;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Map.Entry;
@@ -51,19 +52,19 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 	}
 
 	@Override
-	public String writeToString(BDictionary value) throws IOException {
-		final StringBuffer buffer = new StringBuffer();
+	public ByteBuffer writeToByteBuffer(BDictionary value) throws IOException {
+		try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
+			stream.write(DICTIONARY);
 
-		buffer.append(DICTIONARY);
+			for (Entry<BString, BValue<?>> entry : value.entrySet()) {
+				stream.write(this.parsers.getBStringParser().writeToBytes(entry.getKey()));
+				stream.write(this.parsers.getBValueParser().writeToBytes(entry.getValue()));
+			}
 
-		for (Entry<BString, BValue<?>> entry : value.entrySet()) {
-			buffer.append(this.parsers.getBStringParser().writeToString(entry.getKey()));
-			buffer.append(this.parsers.getBValueParser().writeToString(entry.getValue()));
+			stream.write(END);
+
+			return ByteBuffer.wrap(stream.toByteArray());
 		}
-
-		buffer.append(END);
-
-		return buffer.toString();
 	}
 
 }

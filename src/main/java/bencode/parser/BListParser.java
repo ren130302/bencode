@@ -1,5 +1,6 @@
 package bencode.parser;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.regex.Pattern;
@@ -46,17 +47,18 @@ public final class BListParser implements IBValueParser<BList<?>> {
 	}
 
 	@Override
-	public String writeToString(BList<?> value) throws IOException {
-		final StringBuffer buffer = new StringBuffer();
-		buffer.append(LIST);
+	public ByteBuffer writeToByteBuffer(BList<?> value) throws IOException {
+		try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
+			stream.write(LIST);
 
-		for (BValue<?> v : value.getValue()) {
-			buffer.append(this.parsers.getBValueParser().writeToString(v));
+			for (BValue<?> v : value.getValue()) {
+				stream.write(this.parsers.getBValueParser().writeToBytes(v));
+			}
+
+			stream.write(END);
+
+			return ByteBuffer.wrap(stream.toByteArray());
 		}
-
-		buffer.append(END);
-
-		return buffer.toString();
 	}
 
 }

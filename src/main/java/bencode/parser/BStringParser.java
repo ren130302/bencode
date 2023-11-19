@@ -1,5 +1,6 @@
 package bencode.parser;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.regex.Pattern;
@@ -34,14 +35,14 @@ public final class BStringParser implements IBValueParser<BString> {
 	}
 
 	@Override
-	public String writeToString(@NonNull BString value) throws IOException {
-		final StringBuffer buffer = new StringBuffer();
+	public ByteBuffer writeToByteBuffer(@NonNull BString value) throws IOException {
+		try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
+			stream.write(Integer.toString(value.getValue().length).getBytes(this.getCharset()));
+			stream.write(CORON);
+			stream.write(value.get());
 
-		buffer.append(value.getValue().length);
-		buffer.append(CORON);
-		buffer.append(value.getString(this.getCharset()));
-
-		return buffer.toString();
+			return ByteBuffer.wrap(stream.toByteArray());
+		}
 	}
 
 }

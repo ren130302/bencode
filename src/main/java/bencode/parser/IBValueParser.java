@@ -32,13 +32,13 @@ public interface IBValueParser<T extends BValue<?>> {
 		return this.readFromBytes(data.getBytes(this.getCharset()));
 	}
 
-	default ByteBuffer writeToByteBuffer(@NonNull T value) throws IOException {
-		return ByteBuffer.wrap(this.writeToBytes(value));
-	}
+	ByteBuffer writeToByteBuffer(@NonNull T value) throws IOException;
 
 	default byte[] writeToBytes(@NonNull T value) throws IOException {
-		return this.writeToString(value).getBytes(this.getCharset());
+		return this.writeToByteBuffer(value).array();
 	}
 
-	String writeToString(@NonNull T value) throws IOException;
+	default String writeToString(@NonNull T value) throws IOException {
+		return new String(this.writeToBytes(value), this.getCharset());
+	}
 }

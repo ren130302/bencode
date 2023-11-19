@@ -4,7 +4,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class ByteBufferUtils {
+public final class ByteBufferUtils {
 	public static int get(ByteBuffer byteBuffer) throws EOFException {
 		hasRemaining(byteBuffer);
 

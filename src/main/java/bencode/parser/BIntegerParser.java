@@ -1,5 +1,6 @@
 package bencode.parser;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.regex.Pattern;
@@ -43,13 +44,13 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 	}
 
 	@Override
-	public String writeToString(@NonNull BInteger value) throws IOException {
-		final StringBuffer buffer = new StringBuffer();
+	public ByteBuffer writeToByteBuffer(@NonNull BInteger value) throws IOException {
+		try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
+			stream.write(INTEGER);
+			stream.write(Long.toString(value.longValue()).getBytes(this.getCharset()));
+			stream.write(END);
 
-		buffer.append(INTEGER);
-		buffer.append(value.longValue());
-		buffer.append(END);
-
-		return buffer.toString();
+			return ByteBuffer.wrap(stream.toByteArray());
+		}
 	}
 }
