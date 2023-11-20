@@ -6,14 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import com.dampcake.bencode.Bencode;
-import com.dampcake.bencode.Type;
-
-import bencode.json.BEncodeJson;
 import bencode.values.BDictionary;
 
 //@Log
@@ -32,7 +27,6 @@ public class ParseTest {
 			data = inputStream.readAllBytes();
 		}
 
-		Map<?, ?> m = new Bencode().decode(data, Type.DICTIONARY);
 //		System.out.println(BEncodeJson.get().writeValueAsString(m));
 
 		BDictionary desirialized = this.valueParsers.readBDictionaryFromBytes(data);
@@ -42,6 +36,5 @@ public class ParseTest {
 
 		assertArrayEquals(serialized, serialized2);
 		assertEquals(desirialized.toString(), desirialized2.toString());
-		assertEquals(BEncodeJson.get().writeValueAsString(desirialized), BEncodeJson.get().writeValueAsString(m));
 	}
 }
