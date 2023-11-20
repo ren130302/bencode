@@ -3,8 +3,8 @@ package bencode.json;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-import bencode.BInteger;
-import bencode.BString;
+import bencode.values.BInteger;
+import bencode.values.BString;
 
 public final class BEncodeJson {
 	public static ObjectMapper get() {

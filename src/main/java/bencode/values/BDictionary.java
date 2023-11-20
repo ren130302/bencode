@@ -1,4 +1,4 @@
-package bencode;
+package bencode.values;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

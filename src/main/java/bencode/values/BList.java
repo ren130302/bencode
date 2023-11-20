@@ -1,4 +1,4 @@
-package bencode;
+package bencode.values;
 
 import java.util.ArrayList;
 import java.util.Collection;

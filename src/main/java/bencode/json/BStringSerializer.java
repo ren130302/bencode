@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-import bencode.BString;
+import bencode.values.BString;
 
 public class BStringSerializer extends StdSerializer<BString> {
 

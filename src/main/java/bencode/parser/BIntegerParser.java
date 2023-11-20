@@ -1,10 +1,13 @@
 package bencode.parser;
 
-import static bencode.parser.BValueCharacter.NEGA;
+import static bencode.utils.ConstCharacter.NEGA;
 
 import java.io.IOException;
 
-import bencode.BInteger;
+import bencode.BValueParsers;
+import bencode.io.BEncodeInputStream;
+import bencode.io.BEncodeOutputStream;
+import bencode.values.BInteger;
 import lombok.NonNull;
 import lombok.Value;
 

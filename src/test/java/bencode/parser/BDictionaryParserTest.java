@@ -6,7 +6,8 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
-import bencode.BDictionary;
+import bencode.BValueParsers;
+import bencode.values.BDictionary;
 
 class BDictionaryParserTest {
 	private static final BValueParsers PARSER = new BValueParsers();

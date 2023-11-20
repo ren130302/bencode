@@ -2,11 +2,14 @@ package bencode.parser;
 
 import java.io.IOException;
 
-import bencode.BDictionary;
-import bencode.BInteger;
-import bencode.BList;
-import bencode.BString;
-import bencode.BValue;
+import bencode.BValueParsers;
+import bencode.io.BEncodeInputStream;
+import bencode.io.BEncodeOutputStream;
+import bencode.values.BDictionary;
+import bencode.values.BInteger;
+import bencode.values.BList;
+import bencode.values.BString;
+import bencode.values.BValue;
 import lombok.NonNull;
 import lombok.Value;
 

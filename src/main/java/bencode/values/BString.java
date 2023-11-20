@@ -1,4 +1,4 @@
-package bencode;
+package bencode.values;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;

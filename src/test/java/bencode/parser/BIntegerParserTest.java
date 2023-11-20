@@ -6,7 +6,8 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
-import bencode.BInteger;
+import bencode.BValueParsers;
+import bencode.values.BInteger;
 
 class BIntegerParserTest {
 

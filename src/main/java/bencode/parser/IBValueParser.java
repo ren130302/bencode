@@ -2,7 +2,10 @@ package bencode.parser;
 
 import java.nio.charset.Charset;
 
-import bencode.BValue;
+import bencode.BValueParsers;
+import bencode.io.BValueDeserializer;
+import bencode.io.BValueSerializer;
+import bencode.values.BValue;
 
 public interface IBValueParser<T extends BValue<?>> extends BValueSerializer<T>, BValueDeserializer<T> {
 

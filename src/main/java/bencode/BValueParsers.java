@@ -1,15 +1,23 @@
-package bencode.parser;
+package bencode;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import bencode.BDictionary;
-import bencode.BInteger;
-import bencode.BList;
-import bencode.BString;
-import bencode.BValue;
+import bencode.io.BEncodeInputStream;
+import bencode.io.BEncodeOutputStream;
+import bencode.parser.BDictionaryParser;
+import bencode.parser.BIntegerParser;
+import bencode.parser.BListParser;
+import bencode.parser.BStringParser;
+import bencode.parser.BValueParser;
+import bencode.parser.IBValueParser;
+import bencode.values.BDictionary;
+import bencode.values.BInteger;
+import bencode.values.BList;
+import bencode.values.BString;
+import bencode.values.BValue;
 import lombok.NonNull;
 import lombok.Value;
 

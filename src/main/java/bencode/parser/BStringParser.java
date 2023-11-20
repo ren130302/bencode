@@ -2,7 +2,10 @@ package bencode.parser;
 
 import java.io.IOException;
 
-import bencode.BString;
+import bencode.BValueParsers;
+import bencode.io.BEncodeInputStream;
+import bencode.io.BEncodeOutputStream;
+import bencode.values.BString;
 import lombok.NonNull;
 import lombok.Value;
 

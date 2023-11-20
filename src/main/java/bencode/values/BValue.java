@@ -1,4 +1,4 @@
-package bencode;
+package bencode.values;
 
 import java.io.Serializable;
 

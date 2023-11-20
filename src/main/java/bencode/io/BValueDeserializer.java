@@ -1,8 +1,8 @@
-package bencode.parser;
+package bencode.io;
 
 import java.io.IOException;
 
-import bencode.BValue;
+import bencode.values.BValue;
 import lombok.NonNull;
 
 public interface BValueDeserializer<T extends BValue<?>> {

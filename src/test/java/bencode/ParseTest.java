@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 
 import bencode.json.BEncodeJson;
-import bencode.parser.BValueParsers;
+import bencode.values.BDictionary;
 
 //@Log
 public class ParseTest {

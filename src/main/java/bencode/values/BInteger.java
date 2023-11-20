@@ -1,4 +1,4 @@
-package bencode;
+package bencode.values;
 
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;

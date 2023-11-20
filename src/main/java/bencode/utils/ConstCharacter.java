@@ -1,6 +1,6 @@
-package bencode.parser;
+package bencode.utils;
 
-public class BValueCharacter {
+public final class ConstCharacter {
 	public static final char CORON = ':';
 	public static final char INTEGER = 'i';
 	public static final char LIST = 'l';
