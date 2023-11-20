@@ -42,7 +42,7 @@ public final class BEncodeInputStream implements Closeable {
 	}
 
 	public boolean isCode(int c, char ch) throws IOException {
-		if (c != ch) {
+		if ((char) c != ch) {
 			return false;
 		}
 
@@ -66,7 +66,7 @@ public final class BEncodeInputStream implements Closeable {
 	}
 
 	public boolean isEndCode() throws IOException {
-		return this.isCode(this.read(), END);
+		return this.isCode(this.unread(), END);
 	}
 
 	public IllegalArgumentException makeCodeExcept(char ch) throws IOException {
@@ -93,5 +93,9 @@ public final class BEncodeInputStream implements Closeable {
 
 	public IllegalArgumentException unknownStartCode() throws IOException {
 		return new IllegalArgumentException("Unknown start code. '" + (char) this.unread() + "'");
+	}
+
+	public IOException createExcept(String msg, Throwable cause) throws IOException {
+		return new IOException(msg + ":" + new String(this._stream.readAllBytes()), cause);
 	}
 }

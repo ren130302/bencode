@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 
+import bencode.json.BEncodeJson;
 import bencode.parser.BValueParsers;
 
 //@Log
@@ -25,6 +26,9 @@ public class ParseTest {
 		}
 		BDictionary desirialized = this.valueParsers.readBDictinaryFromBytes(data);
 		byte[] serialized = this.valueParsers.writeBDictinaryToBytes(desirialized);
+
+		System.out.println(BEncodeJson.get().writeValueAsString(desirialized));
+
 //		BDictionary desirialized2 = this.valueParsers.getBDictionaryParser().readFromByteBuffer(serialized);
 //		System.out.println(data);
 //		System.out.println(serialized);
