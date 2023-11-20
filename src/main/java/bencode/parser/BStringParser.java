@@ -15,15 +15,11 @@ public final class BStringParser implements IBValueParser<BString> {
 	public BString deserialize(@NonNull BEncodeInputStream stream) throws IOException {
 		StringBuffer strBuf = new StringBuffer();
 
-		int c = -1;
+		int c = stream.read();
 
-		while (stream.isCoronCode()) {
+		while (stream.isCoronCode() && Character.isDigit(c)) {
+			strBuf.append((char) c);
 			c = stream.read();
-			if (Character.isDigit(c)) {
-				strBuf.append((char) stream.read());
-				continue;
-			}
-			break;
 		}
 
 		int length = Integer.parseInt(strBuf.toString());

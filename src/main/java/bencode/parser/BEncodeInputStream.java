@@ -41,24 +41,20 @@ public final class BEncodeInputStream implements Closeable {
 		return buf;
 	}
 
-	public boolean isCode(int c, char ch) throws IOException {
-		if ((char) c != ch) {
-			return false;
-		}
-
-		return true;
+	public boolean isCode(int c, int ch) throws IOException {
+		return c == ch;
 	}
 
-	public boolean isIntCode() throws IOException {
-		return this.isCode(this.read(), INTEGER);
+	public boolean isIntCode(int c) throws IOException {
+		return this.isCode(c, INTEGER);
 	}
 
-	public boolean isDictCode() throws IOException {
-		return this.isCode(this.read(), DICTIONARY);
+	public boolean isDictCode(int c) throws IOException {
+		return this.isCode(c, DICTIONARY);
 	}
 
-	public boolean isListCode() throws IOException {
-		return this.isCode(this.read(), LIST);
+	public boolean isListCode(int c) throws IOException {
+		return this.isCode(c, LIST);
 	}
 
 	public boolean isCoronCode() throws IOException {
@@ -74,19 +70,19 @@ public final class BEncodeInputStream implements Closeable {
 	}
 
 	public void checkDictCode() throws IOException {
-		if (this.isDictCode()) {
+		if (this.isDictCode(this.read())) {
 			this.makeCodeExcept(DICTIONARY);
 		}
 	}
 
 	public void checkListCode() throws IOException {
-		if (this.isDictCode()) {
+		if (this.isListCode(this.read())) {
 			this.makeCodeExcept(LIST);
 		}
 	}
 
 	public void checkIntCode() throws IOException {
-		if (this.isDictCode()) {
+		if (this.isIntCode(this.read())) {
 			this.makeCodeExcept(INTEGER);
 		}
 	}

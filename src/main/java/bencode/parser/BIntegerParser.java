@@ -15,26 +15,18 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 
 	@Override
 	public BInteger deserialize(@NonNull BEncodeInputStream stream) throws IOException {
-		try {
-			stream.checkIntCode();
+		stream.checkIntCode();
 
-			StringBuffer strBuf = new StringBuffer();
+		StringBuffer strBuf = new StringBuffer();
+
+		while (!stream.isEndCode()) {
 			int c = stream.read();
-
-			while (stream.isEndCode()) {
-
-				if ((c == NEGA || Character.isDigit((char) c))) {
-					strBuf.append((char) c);
-				}
-				c = stream.read();
+			if (c == NEGA || Character.isDigit(c)) {
+				strBuf.append((char) c);
 			}
-			System.out.println(strBuf);
-			long number = Long.parseLong(strBuf.toString());
-
-			return BInteger.valueOf(number);
-		} catch (Exception e) {
-			throw stream.createExcept("", e);
 		}
+
+		return BInteger.valueOf(Long.parseLong(strBuf.toString()));
 	}
 
 	@Override

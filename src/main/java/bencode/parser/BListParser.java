@@ -20,7 +20,7 @@ public final class BListParser implements IBValueParser<BList<?>> {
 
 		BValue<?> value = null;
 
-		while (stream.isEndCode()) {
+		while (!stream.isEndCode()) {
 			value = this.parsers.getBValueParser().deserialize(stream);
 			result.add(value);
 		}
