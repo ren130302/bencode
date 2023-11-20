@@ -1,9 +1,8 @@
 package bencode.parser;
 
-import java.io.ByteArrayOutputStream;
+import static bencode.parser.BValueCharacter.NEGA;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.regex.Pattern;
 
 import bencode.BInteger;
 import lombok.NonNull;
@@ -12,30 +11,21 @@ import lombok.Value;
 @Value
 public final class BIntegerParser implements IBValueParser<BInteger> {
 
-	public static final Pattern PATTERN = Pattern.compile("(?sm)^i(?<number>\\d+)e$");
-
 	private final BValueParsers parsers;
 
 	@Override
-	public BInteger readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
-		int c = ByteBufferUtils.get(byteBuffer);
-
-		if (c != INTEGER) {
-			throw new IllegalArgumentException("Expected 'i', not '" + (char) c + "'");
-		}
+	public BInteger deserialize(@NonNull BEncodeInputStream stream) throws IOException {
+		stream.checkIntCode();
 
 		StringBuffer strBuf = new StringBuffer();
+		int c = stream.read();
 
-		while (c != END) {
+		while (stream.isEndCode()) {
 
 			if ((c == NEGA || Character.isDigit(c))) {
 				strBuf.append((char) c);
 			}
-			c = ByteBufferUtils.get(byteBuffer);
-		}
-
-		if (c != END) {
-			throw new IllegalArgumentException("Expected 'e', not '" + (char) c + "'");
+			c = stream.read();
 		}
 
 		long number = Long.parseLong(strBuf.toString());
@@ -44,13 +34,10 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 	}
 
 	@Override
-	public ByteBuffer writeToByteBuffer(@NonNull BInteger value) throws IOException {
-		try (ByteArrayOutputStream stream = new ByteArrayOutputStream()) {
-			stream.write(INTEGER);
-			stream.write(Long.toString(value.longValue()).getBytes(this.getCharset()));
-			stream.write(END);
-
-			return ByteBuffer.wrap(stream.toByteArray());
-		}
+	public void serialize(@NonNull BEncodeOutputStream stream, @NonNull BInteger value) throws IOException {
+		stream.writeIntCode();
+		stream.writeLong(value.longValue());
+		stream.writeEndCode();
 	}
+
 }

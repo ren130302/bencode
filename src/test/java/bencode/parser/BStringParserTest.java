@@ -12,9 +12,6 @@ class BStringParserTest {
 
 	private static final BValueParsers PARSER = new BValueParsers();
 
-	private static final BValueParser PARSER_BVAL = PARSER.getBValueParser();
-	private static final BStringParser PARSER_BSTR = PARSER.getBStringParser();
-
 	private final String str_empty = "0:";
 	private final BString bstr_empty = BString.valueOf("");
 
@@ -26,8 +23,8 @@ class BStringParserTest {
 
 	@Test
 	void testReadEmpty() throws IOException {
-		BString actual_bval = (BString) PARSER_BVAL.readFromString(this.str_empty);
-		BString actual_bstr = PARSER_BSTR.readFromString(this.str_empty);
+		BString actual_bval = (BString) PARSER.readBValueFromString(this.str_empty);
+		BString actual_bstr = PARSER.readBStringFromString(this.str_empty);
 
 		assertEquals(this.bstr_empty, actual_bval);
 		assertEquals(this.bstr_empty, actual_bstr);
@@ -35,8 +32,8 @@ class BStringParserTest {
 
 	@Test
 	void testWriteEmpty() throws IOException {
-		String actual_bval = PARSER_BVAL.writeToString(this.bstr_empty);
-		String actual_bstr = PARSER_BSTR.writeToString(this.bstr_empty);
+		String actual_bval = PARSER.writeBValueToString(this.bstr_empty);
+		String actual_bstr = PARSER.writeBStringToString(this.bstr_empty);
 
 		assertEquals(this.str_empty, actual_bval);
 		assertEquals(this.str_empty, actual_bstr);
@@ -44,8 +41,8 @@ class BStringParserTest {
 
 	@Test
 	void testReadBytes() throws IOException {
-		BString actual_bval = (BString) PARSER_BVAL.readFromString(this.str_bytes);
-		BString actual_bstr = PARSER_BSTR.readFromString(this.str_bytes);
+		BString actual_bval = (BString) PARSER.readBValueFromString(this.str_bytes);
+		BString actual_bstr = PARSER.readBStringFromString(this.str_bytes);
 
 		assertEquals(this.bstr_bytes, actual_bval);
 		assertEquals(this.bstr_bytes, actual_bstr);
@@ -53,8 +50,8 @@ class BStringParserTest {
 
 	@Test
 	void testWriteBytes() throws IOException {
-		String actual_bval = PARSER_BVAL.writeToString(this.bstr_bytes);
-		String actual_bstr = PARSER_BSTR.writeToString(this.bstr_bytes);
+		String actual_bval = PARSER.writeBValueToString(this.bstr_bytes);
+		String actual_bstr = PARSER.writeBStringToString(this.bstr_bytes);
 
 		assertEquals(this.str_bytes, actual_bval);
 		assertEquals(this.str_bytes, actual_bstr);
@@ -62,8 +59,8 @@ class BStringParserTest {
 
 	@Test
 	void testReadString() throws IOException {
-		BString actual_bval = (BString) PARSER_BVAL.readFromString(this.str_string);
-		BString actual_bstr = PARSER_BSTR.readFromString(this.str_string);
+		BString actual_bval = (BString) PARSER.readBValueFromString(this.str_string);
+		BString actual_bstr = PARSER.readBStringFromString(this.str_string);
 
 		assertEquals(this.bstr_string, actual_bval);
 		assertEquals(this.bstr_string, actual_bstr);
@@ -71,8 +68,8 @@ class BStringParserTest {
 
 	@Test
 	void testWriteString() throws IOException {
-		String actual_bval = PARSER_BVAL.writeToString(this.bstr_string);
-		String actual_bstr = PARSER_BSTR.writeToString(this.bstr_string);
+		String actual_bval = PARSER.writeBValueToString(this.bstr_string);
+		String actual_bstr = PARSER.writeBStringToString(this.bstr_string);
 
 		assertEquals(this.str_string, actual_bval);
 		assertEquals(this.str_string, actual_bstr);

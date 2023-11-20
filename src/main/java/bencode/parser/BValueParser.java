@@ -1,13 +1,13 @@
 package bencode.parser;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import bencode.BDictionary;
 import bencode.BInteger;
 import bencode.BList;
 import bencode.BString;
 import bencode.BValue;
+import lombok.NonNull;
 import lombok.Value;
 
 @Value
@@ -16,39 +16,39 @@ public final class BValueParser implements IBValueParser<BValue<?>> {
 	private final BValueParsers parsers;
 
 	@Override
-	public BValue<?> readFromByteBuffer(ByteBuffer byteBuffer) throws IOException {
-		int indicator = ByteBufferUtils.get(byteBuffer, byteBuffer.position());
-		if (Character.isDigit(indicator)) {
-			return this.getParsers().getBStringParser().readFromByteBuffer(byteBuffer);
+	public BValue<?> deserialize(@NonNull BEncodeInputStream stream) throws IOException {
+		if (Character.isDigit(stream.unread())) {
+			return this.parsers.getBStringParser().deserialize(stream);
 		}
-		switch (indicator) {
-		case INTEGER:
-			return this.getParsers().getBIntegerParser().readFromByteBuffer(byteBuffer);
-		case LIST:
-			return this.getParsers().getBListParser().readFromByteBuffer(byteBuffer);
-		case DICTIONARY:
-			return this.getParsers().getBDictionaryParser().readFromByteBuffer(byteBuffer);
+		if (stream.isIntCode()) {
+			return this.parsers.getBIntegerParser().deserialize(stream);
+		}
+		if (stream.isListCode()) {
+			return this.parsers.getBListParser().deserialize(stream);
+		}
+		if (stream.isDictCode()) {
+			return this.parsers.getBDictionaryParser().deserialize(stream);
 		}
 
-		throw ByteBufferUtils.createUnknownValueType((char) indicator);
+		throw stream.unknownStartCode();
 	}
 
 	@Override
-	public ByteBuffer writeToByteBuffer(BValue<?> value) throws IOException {
+	public void serialize(@NonNull BEncodeOutputStream stream, @NonNull BValue<?> value) throws IOException {
 		if (value instanceof BString v) {
-			return this.getParsers().getBStringParser().writeToByteBuffer(v);
+			this.parsers.getBStringParser().serialize(stream, v);
 		}
 		if (value instanceof BInteger v) {
-			return this.getParsers().getBIntegerParser().writeToByteBuffer(v);
+			this.parsers.getBIntegerParser().serialize(stream, v);
 		}
 		if (value instanceof BList v) {
-			return this.getParsers().getBListParser().writeToByteBuffer(v);
+			this.parsers.getBListParser().serialize(stream, v);
 		}
 		if (value instanceof BDictionary v) {
-			return this.getParsers().getBDictionaryParser().writeToByteBuffer(v);
+			this.parsers.getBDictionaryParser().serialize(stream, v);
 		}
 
-		throw ByteBufferUtils.createUnknownValueType(value.getClass());
+		throw stream.unknownBEncodeType(value.getClass());
 	}
 
 }

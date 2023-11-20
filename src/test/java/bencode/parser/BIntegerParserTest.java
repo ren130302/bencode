@@ -12,9 +12,6 @@ class BIntegerParserTest {
 
 	private static final BValueParsers PARSER = new BValueParsers();
 
-	private static final BValueParser PARSER_BVAL = PARSER.getBValueParser();
-	private static final BIntegerParser PARSER_BINT = PARSER.getBIntegerParser();
-
 	private final String str_zero = "i0e";
 	private final BInteger bint_zero = BInteger.valueOf(0);
 
@@ -26,8 +23,8 @@ class BIntegerParserTest {
 
 	@Test
 	void testReadZero() throws IOException {
-		BInteger actual_bval = (BInteger) PARSER_BVAL.readFromString(this.str_zero);
-		BInteger actual_bint = PARSER_BINT.readFromString(this.str_zero);
+		BInteger actual_bval = (BInteger) PARSER.readBValueFromString(this.str_zero);
+		BInteger actual_bint = PARSER.readBIntegerFromString(this.str_zero);
 
 		assertEquals(this.bint_zero, actual_bval);
 		assertEquals(this.bint_zero, actual_bint);
@@ -35,8 +32,8 @@ class BIntegerParserTest {
 
 	@Test
 	void testWriteZero() throws IOException {
-		String actual_bval = PARSER_BVAL.writeToString(this.bint_zero);
-		String actual_bint = PARSER_BINT.writeToString(this.bint_zero);
+		String actual_bval = PARSER.writeBValueToString(this.bint_zero);
+		String actual_bint = PARSER.writeBIntegerToString(this.bint_zero);
 
 		assertEquals(this.str_zero, actual_bval);
 		assertEquals(this.str_zero, actual_bint);
@@ -44,8 +41,8 @@ class BIntegerParserTest {
 
 	@Test
 	void testReadNegativeValue() throws IOException {
-		BInteger actual_bval = (BInteger) PARSER_BVAL.readFromString(this.str_negative);
-		BInteger actual_bint = PARSER_BINT.readFromString(this.str_negative);
+		BInteger actual_bval = (BInteger) PARSER.readBValueFromString(this.str_negative);
+		BInteger actual_bint = PARSER.readBIntegerFromString(this.str_negative);
 
 		assertEquals(this.bint_negative, actual_bval);
 		assertEquals(this.bint_negative, actual_bint);
@@ -53,8 +50,8 @@ class BIntegerParserTest {
 
 	@Test
 	void testWriteNegativeValue() throws IOException {
-		String actual_bval = PARSER_BVAL.writeToString(this.bint_negative);
-		String actual_bint = PARSER_BINT.writeToString(this.bint_negative);
+		String actual_bval = PARSER.writeBValueToString(this.bint_negative);
+		String actual_bint = PARSER.writeBIntegerToString(this.bint_negative);
 
 		assertEquals(this.str_negative, actual_bval);
 		assertEquals(this.str_negative, actual_bint);
@@ -62,8 +59,8 @@ class BIntegerParserTest {
 
 	@Test
 	void testReadPositiveValue() throws IOException {
-		BInteger actual_bval = (BInteger) PARSER_BVAL.readFromString(this.str_positive);
-		BInteger actual_bint = PARSER_BINT.readFromString(this.str_positive);
+		BInteger actual_bval = (BInteger) PARSER.readBValueFromString(this.str_positive);
+		BInteger actual_bint = PARSER.readBIntegerFromString(this.str_positive);
 
 		assertEquals(this.bint_positive, actual_bval);
 		assertEquals(this.bint_positive, actual_bint);
@@ -71,8 +68,8 @@ class BIntegerParserTest {
 
 	@Test
 	void testWritePositiveValue() throws IOException {
-		String actual_bval = PARSER_BVAL.writeToString(this.bint_positive);
-		String actual_bint = PARSER_BINT.writeToString(this.bint_positive);
+		String actual_bval = PARSER.writeBValueToString(this.bint_positive);
+		String actual_bint = PARSER.writeBIntegerToString(this.bint_positive);
 
 		assertEquals(this.str_positive, actual_bval);
 		assertEquals(this.str_positive, actual_bint);

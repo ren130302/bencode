@@ -1,9 +1,15 @@
 package bencode.parser;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+import bencode.BDictionary;
+import bencode.BInteger;
+import bencode.BList;
+import bencode.BString;
+import bencode.BValue;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -11,7 +17,8 @@ import lombok.Value;
 public final class BValueParsers {
 
 	private final Charset charset;
-	private final Map<Class<? extends IBValueParser<?>>, IBValueParser<?>> knownParsers = new HashMap<>();
+
+	private final Map<Class<?>, IBValueParser<?>> knownParsers = new HashMap<>();
 
 	public BValueParsers() {
 		this.charset = Charset.defaultCharset();
@@ -24,19 +31,11 @@ public final class BValueParsers {
 	}
 
 	private void init() {
-		this.register(BValueParser.class);
-		this.register(BDictionaryParser.class);
-		this.register(BListParser.class);
-		this.register(BIntegerParser.class);
-		this.register(BStringParser.class);
-	}
-
-	private void register(@NonNull Class<? extends IBValueParser<?>> cls) {
-		try {
-			this.knownParsers.put(cls, cls.getDeclaredConstructor(this.getClass()).newInstance(this));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		this.knownParsers.put(BValueParser.class, new BValueParser(this));
+		this.knownParsers.put(BStringParser.class, new BStringParser(this));
+		this.knownParsers.put(BIntegerParser.class, new BIntegerParser(this));
+		this.knownParsers.put(BListParser.class, new BListParser(this));
+		this.knownParsers.put(BDictionaryParser.class, new BDictionaryParser(this));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -62,5 +61,98 @@ public final class BValueParsers {
 
 	public BStringParser getBStringParser() {
 		return this.get(BStringParser.class);
+	}
+
+	public <T extends IBValueParser<V>, V extends BValue<?>> byte[] _write(Class<T> cls, V value) throws IOException {
+		try (BEncodeOutputStream stream = new BEncodeOutputStream(this.charset)) {
+			this.get(cls).serialize(stream, value);
+			return stream.array();
+		}
+	}
+
+	public byte[] writeBDictinaryToBytes(BDictionary value) throws IOException {
+		return this._write(BDictionaryParser.class, value);
+	}
+
+	public String writeBDictinaryToString(BDictionary value) throws IOException {
+		return new String(this.writeBDictinaryToBytes(value), this.charset);
+	}
+
+	public byte[] writeBListToBytes(BList<?> value) throws IOException {
+		return this._write(BListParser.class, value);
+	}
+
+	public String writeBListToString(BList<?> value) throws IOException {
+		return new String(this.writeBListToBytes(value), this.charset);
+	}
+
+	public byte[] writeBIntegerToBytes(BInteger value) throws IOException {
+		return this._write(BIntegerParser.class, value);
+	}
+
+	public String writeBIntegerToString(BInteger value) throws IOException {
+		return new String(this.writeBIntegerToBytes(value), this.charset);
+	}
+
+	public byte[] writeBStringToBytes(BString value) throws IOException {
+		return this._write(BStringParser.class, value);
+	}
+
+	public String writeBStringToString(BString value) throws IOException {
+		return new String(this.writeBStringToBytes(value), this.charset);
+	}
+
+	public byte[] writeBValueToBytes(BValue<?> value) throws IOException {
+		return this._write(BValueParser.class, value);
+	}
+
+	public String writeBValueToString(BValue<?> value) throws IOException {
+		return new String(this.writeBValueToBytes(value), this.charset);
+	}
+
+	private <T extends IBValueParser<V>, V extends BValue<?>> V _read(Class<T> cls, byte[] bytes) throws IOException {
+		try (BEncodeInputStream stream = new BEncodeInputStream(bytes)) {
+			return this.get(cls).deserialize(stream);
+		}
+	}
+
+	public BDictionary readBDictinaryFromBytes(byte[] bytes) throws IOException {
+		return this._read(BDictionaryParser.class, bytes);
+	}
+
+	public BDictionary readBDictinaryFromString(String data) throws IOException {
+		return this.readBDictinaryFromBytes(data.getBytes(this.charset));
+	}
+
+	public BList<?> readBListFromBytes(byte[] bytes) throws IOException {
+		return this._read(BListParser.class, bytes);
+	}
+
+	public BList<?> readBListFromString(String data) throws IOException {
+		return this.readBListFromBytes(data.getBytes(this.charset));
+	}
+
+	public BInteger readBIntegerFromBytes(byte[] bytes) throws IOException {
+		return this._read(BIntegerParser.class, bytes);
+	}
+
+	public BInteger readBIntegerFromString(String data) throws IOException {
+		return this.readBIntegerFromBytes(data.getBytes(this.charset));
+	}
+
+	public BString readBStringFromBytes(byte[] bytes) throws IOException {
+		return this._read(BStringParser.class, bytes);
+	}
+
+	public BString readBStringFromString(String data) throws IOException {
+		return this.readBStringFromBytes(data.getBytes(this.charset));
+	}
+
+	public BValue<?> readBValueFromBytes(byte[] bytes) throws IOException {
+		return this._read(BValueParser.class, bytes);
+	}
+
+	public BValue<?> readBValueFromString(String data) throws IOException {
+		return this.readBValueFromBytes(data.getBytes(this.charset));
 	}
 }
