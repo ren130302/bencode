@@ -38,7 +38,6 @@ public final class BValueParser implements IBValueParser<BValue<?>> {
 
 	@Override
 	public void serialize(@NonNull BEncodeOutputStream stream, @NonNull BValue<?> value) throws IOException {
-		System.out.println(value.getClass());
 		try {
 			value = BString.class.cast(value);
 			if (value instanceof BString v || value.getClass() == BString.class) {

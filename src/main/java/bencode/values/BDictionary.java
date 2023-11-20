@@ -1,5 +1,7 @@
 package bencode.values;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -34,7 +36,7 @@ public final class BDictionary extends LinkedHashMap<BString, BValue<?>> impleme
 	}
 
 	public BValue<?> get(String key) {
-		return this.getValue().get(BString.valueOf(key));
+		return this.get(BString.valueOf(key));
 	}
 
 	public BDictionary getBDictionary(String key) {
@@ -54,7 +56,31 @@ public final class BDictionary extends LinkedHashMap<BString, BValue<?>> impleme
 	}
 
 	public BValue<?> put(String key, BValue<?> value) {
-		return this.getValue().put(BString.valueOf(key), value);
+		return this.put(BString.valueOf(key), value);
+	}
+
+	public BValue<?> put(String key, Number value) {
+		return this.put(BString.valueOf(key), BInteger.valueOf(value));
+	}
+
+	public BValue<?> put(String key, byte[] value) {
+		return this.put(BString.valueOf(key), BString.valueOf(value));
+	}
+
+	public BValue<?> put(String key, Byte[] value) {
+		return this.put(BString.valueOf(key), BString.valueOf(value));
+	}
+
+	public BValue<?> put(String key, String value) {
+		return this.put(BString.valueOf(key), BString.valueOf(value));
+	}
+
+	public BValue<?> put(String key, String value, Charset charset) {
+		return this.put(BString.valueOf(key), BString.valueOf(value, charset));
+	}
+
+	public BValue<?> put(String key, String value, String charset) throws UnsupportedEncodingException {
+		return this.put(BString.valueOf(key), BString.valueOf(value, charset));
 	}
 
 }

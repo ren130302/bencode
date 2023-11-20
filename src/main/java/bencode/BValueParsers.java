@@ -78,12 +78,12 @@ public final class BValueParsers {
 		}
 	}
 
-	public byte[] writeBDictinaryToBytes(BDictionary value) throws IOException {
+	public byte[] writeBDictionaryToBytes(BDictionary value) throws IOException {
 		return this._write(BDictionaryParser.class, value);
 	}
 
-	public String writeBDictinaryToString(BDictionary value) throws IOException {
-		return new String(this.writeBDictinaryToBytes(value), this.charset);
+	public String writeBDictionaryToString(BDictionary value) throws IOException {
+		return new String(this.writeBDictionaryToBytes(value), this.charset);
 	}
 
 	public byte[] writeBListToBytes(BList<?> value) throws IOException {
@@ -124,12 +124,12 @@ public final class BValueParsers {
 		}
 	}
 
-	public BDictionary readBDictinaryFromBytes(byte[] bytes) throws IOException {
+	public BDictionary readBDictionaryFromBytes(byte[] bytes) throws IOException {
 		return this._read(BDictionaryParser.class, bytes);
 	}
 
-	public BDictionary readBDictinaryFromString(String data) throws IOException {
-		return this.readBDictinaryFromBytes(data.getBytes(this.charset));
+	public BDictionary readBDictionaryFromString(String data) throws IOException {
+		return this.readBDictionaryFromBytes(data.getBytes(this.charset));
 	}
 
 	public BList<?> readBListFromBytes(byte[] bytes) throws IOException {

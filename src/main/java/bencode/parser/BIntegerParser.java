@@ -1,7 +1,5 @@
 package bencode.parser;
 
-import static bencode.utils.ConstCharacter.NEGA;
-
 import java.io.IOException;
 
 import bencode.BValueParsers;
@@ -22,9 +20,14 @@ public final class BIntegerParser implements IBValueParser<BInteger> {
 
 		StringBuffer strBuf = new StringBuffer();
 
-		while (!stream.isEndCode()) {
+		while (stream.hasRemaining()) {
+			if (stream.isEndCode()) {
+				stream.read();
+				break;
+			}
+
 			int c = stream.read();
-			if (c == NEGA || Character.isDigit(c)) {
+			if (Character.isDigit(c) || stream.isNegaCode(c)) {
 				strBuf.append((char) c);
 			}
 		}

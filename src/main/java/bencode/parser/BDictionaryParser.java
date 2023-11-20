@@ -26,7 +26,12 @@ public final class BDictionaryParser implements IBValueParser<BDictionary> {
 		BString key = null;
 		BValue<?> value = null;
 
-		while (!stream.isEndCode()) {
+		while (stream.hasRemaining()) {
+			if (stream.isEndCode()) {
+				stream.read();
+				break;
+			}
+
 			key = this.parsers.getBStringParser().deserialize(stream);
 			value = this.parsers.getBValueParser().deserialize(stream);
 			result.put(key, value);

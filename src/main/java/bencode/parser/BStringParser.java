@@ -20,8 +20,13 @@ public final class BStringParser implements IBValueParser<BString> {
 
 		int c = stream.read();
 
-		while (stream.isCoronCode() && Character.isDigit(c)) {
-			strBuf.append((char) c);
+		while (stream.hasRemaining()) {
+			if (stream.isCoronCode(c)) {
+				break;
+			}
+			if (Character.isDigit(c)) {
+				strBuf.append((char) c);
+			}
 			c = stream.read();
 		}
 

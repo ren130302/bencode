@@ -5,6 +5,7 @@ import static bencode.utils.ConstCharacter.DICTIONARY;
 import static bencode.utils.ConstCharacter.END;
 import static bencode.utils.ConstCharacter.INTEGER;
 import static bencode.utils.ConstCharacter.LIST;
+import static bencode.utils.ConstCharacter.NEGA;
 
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
@@ -22,6 +23,10 @@ public final class BEncodeInputStream implements Closeable {
 	@Override
 	public void close() throws IOException {
 		this._stream.close();
+	}
+
+	public boolean hasRemaining() throws IOException {
+		return 0 <= this._stream.available();
 	}
 
 	public int unread() throws IOException {
@@ -57,8 +62,12 @@ public final class BEncodeInputStream implements Closeable {
 		return this.isCode(c, LIST);
 	}
 
-	public boolean isCoronCode() throws IOException {
-		return this.isCode(this.unread(), CORON);
+	public boolean isNegaCode(int c) throws IOException {
+		return this.isCode(c, NEGA);
+	}
+
+	public boolean isCoronCode(int c) throws IOException {
+		return this.isCode(c, CORON);
 	}
 
 	public boolean isEndCode() throws IOException {
