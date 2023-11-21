@@ -13,3 +13,5 @@ plugins {
 }
 
 rootProject.name = 'bencode'
+
+include('core', 'json')

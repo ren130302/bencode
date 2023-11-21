@@ -1,46 +1,12 @@
-plugins{
-	id 'java'
-	id 'eclipse'
-	id 'idea'
-}
-
-def JavaVersion = 17
-def Encode = 'UTF-8'
-	
-java.toolchain.languageVersion = JavaLanguageVersion.of(JavaVersion)
-tasks.withType(JavaCompile) {options.encoding = Encode}
-
-eclipse{
-	classpath {
-		downloadSources = true
-	    downloadJavadoc = true
+subprojects {
+	plugins {
+	    id 'myproject.java-conventions'
 	}
 }
 
-idea {
-	module {
-	    downloadJavadoc = true
-	    downloadSources = true
+project(":json") {
+	dependencies {
+		implementation(project(":core"))
+		implementation("com.fasterxml.jackson.core:jackson-databind:2.15.3")
 	}
-}
- 
-
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-
-def JUnitVersion = '5.10.1'
-def LombokVersion = '1.18.26'
-
-repositories {
-    mavenCentral()
-}
- 
-dependencies{ 
-	testImplementation(platform("org.junit:junit-bom:$JUnitVersion"))
-	testImplementation("org.junit.jupiter:junit-jupiter")
-
-    compileOnly "org.projectlombok:lombok:$LombokVersion"
-	annotationProcessor "org.projectlombok:lombok:$LombokVersion"
-	
-	testCompileOnly "org.projectlombok:lombok:$LombokVersion"
-	testAnnotationProcessor "org.projectlombok:lombok:$LombokVersion"
 }
