@@ -1,9 +1,9 @@
-package bencode.parser;
+package bencode.io.parser;
 
 import java.nio.charset.Charset;
 
-import bencode.BValueParsers;
 import bencode.io.BValueDeserializer;
+import bencode.io.BValueParsers;
 import bencode.io.BValueSerializer;
 import bencode.values.BValue;
 

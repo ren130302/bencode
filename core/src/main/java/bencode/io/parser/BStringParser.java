@@ -1,10 +1,10 @@
-package bencode.parser;
+package bencode.io.parser;
 
 import java.io.IOException;
 
-import bencode.BValueParsers;
 import bencode.io.BEncodeInputStream;
 import bencode.io.BEncodeOutputStream;
+import bencode.io.BValueParsers;
 import bencode.values.BString;
 import lombok.NonNull;
 import lombok.Value;
@@ -38,7 +38,7 @@ public final class BStringParser implements IBValueParser<BString> {
 	public void serialize(@NonNull BEncodeOutputStream stream, @NonNull BString value) throws IOException {
 		stream.writeLong(value.getValue().length);
 		stream.writeCoronCode();
-		stream.writeBytes(value.get());
+		stream.writeBytes(value.getBytes());
 	}
 
 }

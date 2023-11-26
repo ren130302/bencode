@@ -97,16 +97,16 @@ public final class BString implements BValue<Byte[]>, Comparable<BString> {
 		return thisLength - thatLength;
 	}
 
-	public byte[] get() {
+	public byte[] getBytes() {
 		return autoboxing(this.value);
 	}
 
 	public String getString() {
-		return new String(this.get());
+		return new String(this.getBytes());
 	}
 
 	public String getString(Charset charset) {
-		return new String(this.get(), charset);
+		return new String(this.getBytes(), charset);
 	}
 
 	public byte[] getLength(Charset charset) {

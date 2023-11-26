@@ -1,11 +1,11 @@
-package bencode.parser;
+package bencode.io.parser;
 
 import java.io.IOException;
 import java.util.Map.Entry;
 
-import bencode.BValueParsers;
 import bencode.io.BEncodeInputStream;
 import bencode.io.BEncodeOutputStream;
+import bencode.io.BValueParsers;
 import bencode.values.BDictionary;
 import bencode.values.BString;
 import bencode.values.BValue;

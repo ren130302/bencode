@@ -1,10 +1,10 @@
-package bencode.parser;
+package bencode.io.parser;
 
 import java.io.IOException;
 
-import bencode.BValueParsers;
 import bencode.io.BEncodeInputStream;
 import bencode.io.BEncodeOutputStream;
+import bencode.io.BValueParsers;
 import bencode.values.BList;
 import bencode.values.BValue;
 import lombok.NonNull;

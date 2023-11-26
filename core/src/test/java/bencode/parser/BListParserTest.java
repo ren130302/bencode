@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import bencode.BValueParsers;
+import bencode.io.BValueParsers;
 import bencode.values.BDictionary;
 import bencode.values.BList;
 import bencode.values.BList.BListBInteger;

@@ -1,18 +1,16 @@
-package bencode;
+package bencode.io;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import bencode.io.BEncodeInputStream;
-import bencode.io.BEncodeOutputStream;
-import bencode.parser.BDictionaryParser;
-import bencode.parser.BIntegerParser;
-import bencode.parser.BListParser;
-import bencode.parser.BStringParser;
-import bencode.parser.BValueParser;
-import bencode.parser.IBValueParser;
+import bencode.io.parser.BDictionaryParser;
+import bencode.io.parser.BIntegerParser;
+import bencode.io.parser.BListParser;
+import bencode.io.parser.BStringParser;
+import bencode.io.parser.BValueParser;
+import bencode.io.parser.IBValueParser;
 import bencode.values.BDictionary;
 import bencode.values.BInteger;
 import bencode.values.BList;
@@ -39,11 +37,19 @@ public final class BValueParsers {
 	}
 
 	private void init() {
-		this.knownParsers.put(BValueParser.class, new BValueParser(this));
-		this.knownParsers.put(BStringParser.class, new BStringParser(this));
-		this.knownParsers.put(BIntegerParser.class, new BIntegerParser(this));
-		this.knownParsers.put(BListParser.class, new BListParser(this));
-		this.knownParsers.put(BDictionaryParser.class, new BDictionaryParser(this));
+		this.register(BValueParser.class);
+		this.register(BStringParser.class);
+		this.register(BIntegerParser.class);
+		this.register(BListParser.class);
+		this.register(BDictionaryParser.class);
+	}
+
+	private void register(Class<? extends IBValueParser<?>> cls) {
+		try {
+			cls.getDeclaredConstructor(BValueParsers.class).newInstance(this);
+		} catch (Exception e) {
+			throw new IllegalArgumentException(cls.getSimpleName(), e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -70,6 +76,8 @@ public final class BValueParsers {
 	public BStringParser getBStringParser() {
 		return this.get(BStringParser.class);
 	}
+
+	/* write methods */
 
 	public <T extends IBValueParser<V>, V extends BValue<?>> byte[] _write(Class<T> cls, V value) throws IOException {
 		try (BEncodeOutputStream stream = new BEncodeOutputStream(this.charset)) {
@@ -117,6 +125,8 @@ public final class BValueParsers {
 	public String writeBValueToString(BValue<?> value) throws IOException {
 		return new String(this.writeBValueToBytes(value), this.charset);
 	}
+
+	/* read methods */
 
 	private <T extends IBValueParser<V>, V extends BValue<?>> V _read(Class<T> cls, byte[] bytes) throws IOException {
 		try (BEncodeInputStream stream = new BEncodeInputStream(bytes)) {

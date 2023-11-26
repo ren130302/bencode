@@ -1,10 +1,10 @@
 package bencode.io;
 
-import static bencode.utils.ConstCharacter.CORON;
-import static bencode.utils.ConstCharacter.DICTIONARY;
-import static bencode.utils.ConstCharacter.END;
-import static bencode.utils.ConstCharacter.INTEGER;
-import static bencode.utils.ConstCharacter.LIST;
+import static bencode.io.parser.ConstCharacter.CORON;
+import static bencode.io.parser.ConstCharacter.DICTIONARY;
+import static bencode.io.parser.ConstCharacter.END;
+import static bencode.io.parser.ConstCharacter.INTEGER;
+import static bencode.io.parser.ConstCharacter.LIST;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
