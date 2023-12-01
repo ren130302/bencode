@@ -1,23 +1,88 @@
 package bencode.io;
 
-import static bencode.io.parser.ConstCharacter.CORON;
-import static bencode.io.parser.ConstCharacter.DICTIONARY;
-import static bencode.io.parser.ConstCharacter.END;
-import static bencode.io.parser.ConstCharacter.INTEGER;
-import static bencode.io.parser.ConstCharacter.LIST;
-import static bencode.io.parser.ConstCharacter.NEGA;
+import static bencode.io.ConstCharacter.CORON;
+import static bencode.io.ConstCharacter.DICTIONARY;
+import static bencode.io.ConstCharacter.END;
+import static bencode.io.ConstCharacter.INTEGER;
+import static bencode.io.ConstCharacter.LIST;
+import static bencode.io.ConstCharacter.NEGA;
 
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.PushbackInputStream;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+
+import bencode.io.parser.BDictionaryParser;
+import bencode.io.parser.BIntegerParser;
+import bencode.io.parser.BListParser;
+import bencode.io.parser.BStringParser;
+import bencode.io.parser.BValueParser;
+import bencode.values.BDictionary;
+import bencode.values.BInteger;
+import bencode.values.BList;
+import bencode.values.BString;
+import bencode.values.BValue;
+import lombok.NonNull;
 
 public final class BEncodeInputStream implements Closeable {
 
 	private final PushbackInputStream _stream;
+	private final Charset _charset;
+
+	private final Map<Class<? extends BValueDeserializer<?>>, BValueSerializer<?>> knownDeserializer = new HashMap<>();
 
 	public BEncodeInputStream(byte[] bytes) {
+		this(bytes, Charset.defaultCharset());
+	}
+
+	public BEncodeInputStream(byte[] bytes, Charset charset) {
 		this._stream = new PushbackInputStream(new ByteArrayInputStream(bytes));
+		this._charset = charset;
+		this.init();
+	}
+
+	private void init() {
+		this.register(BValueParser.class);
+		this.register(BStringParser.class);
+		this.register(BIntegerParser.class);
+		this.register(BListParser.class);
+		this.register(BDictionaryParser.class);
+	}
+
+	private void register(Class<?> cls) {
+		try {
+			cls.getDeclaredConstructor().newInstance();
+		} catch (Exception e) {
+			throw new IllegalArgumentException(cls.getSimpleName(), e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T extends BValueSerializer<?>> T get(@NonNull Class<T> cls) {
+		return (T) this.knownDeserializer.get(cls);
+	}
+
+	public BValue<?> deserializeBValue() throws IOException {
+		return this.get(BValueParser.class).deserialize(this);
+	}
+
+	public BDictionary deserializeBDictionary() throws IOException {
+		return this.get(BDictionaryParser.class).deserialize(this);
+	}
+
+	public BList<?> deserializeBList() throws IOException {
+		return this.get(BListParser.class).deserialize(this);
+	}
+
+	public BInteger deserializeBInteger() throws IOException {
+		return this.get(BIntegerParser.class).deserialize(this);
+	}
+
+	public BString deserializeBString() throws IOException {
+		return this.get(BStringParser.class).deserialize(this);
 	}
 
 	@Override
@@ -103,4 +168,5 @@ public final class BEncodeInputStream implements Closeable {
 	public IOException createExcept(String msg, Throwable cause) throws IOException {
 		return new IOException(msg + ":" + new String(this._stream.readAllBytes()), cause);
 	}
+
 }

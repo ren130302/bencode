@@ -5,16 +5,11 @@ import java.io.IOException;
 import bencode.io.BEncodeInputStream;
 import bencode.io.BEncodeOutputStream;
 import bencode.io.BValueDeserializer;
-import bencode.io.BValueParsers;
 import bencode.io.BValueSerializer;
 import bencode.values.BString;
 import lombok.NonNull;
-import lombok.Value;
 
-@Value
 public final class BStringParser implements BValueSerializer<BString>, BValueDeserializer<BString> {
-
-	private final BValueParsers parsers;
 
 	@Override
 	public BString deserialize(@NonNull BEncodeInputStream stream) throws IOException {

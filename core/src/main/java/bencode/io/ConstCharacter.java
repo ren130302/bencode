@@ -1,4 +1,4 @@
-package bencode.io.parser;
+package bencode.io;
 
 public final class ConstCharacter {
 	public static final char CORON = ':';

@@ -6,18 +6,13 @@ import java.util.Map.Entry;
 import bencode.io.BEncodeInputStream;
 import bencode.io.BEncodeOutputStream;
 import bencode.io.BValueDeserializer;
-import bencode.io.BValueParsers;
 import bencode.io.BValueSerializer;
 import bencode.values.BDictionary;
 import bencode.values.BString;
 import bencode.values.BValue;
 import lombok.NonNull;
-import lombok.Value;
 
-@Value
 public final class BDictionaryParser implements BValueSerializer<BDictionary>, BValueDeserializer<BDictionary> {
-
-	private final BValueParsers parsers;
 
 	@Override
 	public BDictionary deserialize(@NonNull BEncodeInputStream stream) throws IOException {
@@ -34,8 +29,8 @@ public final class BDictionaryParser implements BValueSerializer<BDictionary>, B
 				break;
 			}
 
-			key = this.parsers.getBStringParser().deserialize(stream);
-			value = this.parsers.getBValueParser().deserialize(stream);
+			key = stream.deserializeBString();
+			value = stream.deserializeBValue();
 			result.put(key, value);
 		}
 
@@ -47,8 +42,8 @@ public final class BDictionaryParser implements BValueSerializer<BDictionary>, B
 		stream.writeDictCode();
 
 		for (Entry<BString, BValue<?>> entry : value.entrySet()) {
-			this.parsers.getBStringParser().serialize(stream, entry.getKey());
-			this.parsers.getBValueParser().serialize(stream, entry.getValue());
+			stream.serializeBString(entry.getKey());
+			stream.serializeBValue(entry.getValue());
 		}
 
 		stream.writeEndCode();

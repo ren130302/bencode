@@ -5,7 +5,6 @@ import java.io.IOException;
 import bencode.io.BEncodeInputStream;
 import bencode.io.BEncodeOutputStream;
 import bencode.io.BValueDeserializer;
-import bencode.io.BValueParsers;
 import bencode.io.BValueSerializer;
 import bencode.values.BDictionary;
 import bencode.values.BInteger;
@@ -13,26 +12,22 @@ import bencode.values.BList;
 import bencode.values.BString;
 import bencode.values.BValue;
 import lombok.NonNull;
-import lombok.Value;
 
-@Value
 public final class BValueParser implements BValueSerializer<BValue<?>>, BValueDeserializer<BValue<?>> {
-
-	private final BValueParsers parsers;
 
 	@Override
 	public BValue<?> deserialize(@NonNull BEncodeInputStream stream) throws IOException {
 		if (Character.isDigit(stream.unread())) {
-			return this.parsers.getBStringParser().deserialize(stream);
+			return stream.deserializeBString();
 		}
 		if (stream.isIntCode(stream.unread())) {
-			return this.parsers.getBIntegerParser().deserialize(stream);
+			return stream.deserializeBInteger();
 		}
 		if (stream.isListCode(stream.unread())) {
-			return this.parsers.getBListParser().deserialize(stream);
+			return stream.deserializeBList();
 		}
 		if (stream.isDictCode(stream.unread())) {
-			return this.parsers.getBDictionaryParser().deserialize(stream);
+			return stream.deserializeBDictionary();
 		}
 
 		throw stream.unknownStartCode();
@@ -43,7 +38,7 @@ public final class BValueParser implements BValueSerializer<BValue<?>>, BValueDe
 		try {
 			value = BString.class.cast(value);
 			if (value instanceof BString v || value.getClass() == BString.class) {
-				this.parsers.getBStringParser().serialize(stream, (BString) value);
+				stream.serializeBString((BString) value);
 				return;
 			}
 		} catch (Exception e) {
@@ -52,7 +47,7 @@ public final class BValueParser implements BValueSerializer<BValue<?>>, BValueDe
 		try {
 			value = BInteger.class.cast(value);
 			if (value instanceof BInteger v || value.getClass() == BInteger.class) {
-				this.parsers.getBIntegerParser().serialize(stream, (BInteger) value);
+				stream.serializeBInteger((BInteger) value);
 				return;
 			}
 		} catch (Exception e) {
@@ -61,7 +56,7 @@ public final class BValueParser implements BValueSerializer<BValue<?>>, BValueDe
 		try {
 			value = BList.class.cast(value);
 			if (value instanceof BList v || value.getClass() == BList.class) {
-				this.parsers.getBListParser().serialize(stream, (BList<?>) value);
+				stream.serializeBList((BList<?>) value);
 				return;
 			}
 		} catch (Exception e) {
@@ -70,7 +65,7 @@ public final class BValueParser implements BValueSerializer<BValue<?>>, BValueDe
 		try {
 			value = BDictionary.class.cast(value);
 			if (value instanceof BDictionary v || value.getClass() == BDictionary.class) {
-				this.parsers.getBDictionaryParser().serialize(stream, (BDictionary) value);
+				stream.serializeBDictionary((BDictionary) value);
 				return;
 			}
 		} catch (Exception e) {
