@@ -35,41 +35,21 @@ public final class BValueParser implements BValueSerializer<BValue<?>>, BValueDe
 
 	@Override
 	public void serialize(@NonNull BEncodeOutputStream stream, @NonNull BValue<?> value) throws IOException {
-		try {
-			value = BString.class.cast(value);
-			if (value instanceof BString v || value.getClass() == BString.class) {
-				stream.serializeBString((BString) value);
-				return;
-			}
-		} catch (Exception e) {
-			// pass
+		if (value instanceof BString v) {
+			stream.serializeBString(v);
+			return;
 		}
-		try {
-			value = BInteger.class.cast(value);
-			if (value instanceof BInteger v || value.getClass() == BInteger.class) {
-				stream.serializeBInteger((BInteger) value);
-				return;
-			}
-		} catch (Exception e) {
-			// pass
+		if (value instanceof BInteger v) {
+			stream.serializeBInteger(v);
+			return;
 		}
-		try {
-			value = BList.class.cast(value);
-			if (value instanceof BList v || value.getClass() == BList.class) {
-				stream.serializeBList((BList<?>) value);
-				return;
-			}
-		} catch (Exception e) {
-			// pass
+		if (value instanceof BList v) {
+			stream.serializeBList(v);
+			return;
 		}
-		try {
-			value = BDictionary.class.cast(value);
-			if (value instanceof BDictionary v || value.getClass() == BDictionary.class) {
-				stream.serializeBDictionary((BDictionary) value);
-				return;
-			}
-		} catch (Exception e) {
-			// pass
+		if (value instanceof BDictionary v) {
+			stream.serializeBDictionary(v);
+			return;
 		}
 
 		throw stream.unknownBEncodeType(value.getClass());

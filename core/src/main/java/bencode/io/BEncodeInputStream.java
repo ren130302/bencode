@@ -32,7 +32,7 @@ public final class BEncodeInputStream implements Closeable {
 	private final PushbackInputStream _stream;
 	private final Charset _charset;
 
-	private final Map<Class<? extends BValueDeserializer<?>>, BValueSerializer<?>> knownDeserializer = new HashMap<>();
+	private final Map<Class<? extends BValueDeserializer<?>>, BValueDeserializer<?>> knownDeserializer = new HashMap<>();
 
 	public BEncodeInputStream(byte[] bytes) {
 		this(bytes, Charset.defaultCharset());
@@ -52,9 +52,9 @@ public final class BEncodeInputStream implements Closeable {
 		this.register(BDictionaryParser.class);
 	}
 
-	private void register(Class<?> cls) {
+	private void register(Class<? extends BValueDeserializer<?>> cls) {
 		try {
-			cls.getDeclaredConstructor().newInstance();
+			this.knownDeserializer.put(cls, cls.getDeclaredConstructor().newInstance());
 		} catch (Exception e) {
 			throw new IllegalArgumentException(cls.getSimpleName(), e);
 		}

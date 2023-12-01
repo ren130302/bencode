@@ -51,9 +51,9 @@ public final class BEncodeOutputStream implements Closeable, Flushable {
 		this.register(BDictionaryParser.class);
 	}
 
-	private void register(Class<?> cls) {
+	private void register(Class<? extends BValueDeserializer<?>> cls) {
 		try {
-			cls.getDeclaredConstructor().newInstance();
+			this.knownSerializer.put(cls, cls.getDeclaredConstructor().newInstance());
 		} catch (Exception e) {
 			throw new IllegalArgumentException(cls.getSimpleName(), e);
 		}
