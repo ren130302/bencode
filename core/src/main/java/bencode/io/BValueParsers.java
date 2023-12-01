@@ -10,7 +10,6 @@ import bencode.io.parser.BIntegerParser;
 import bencode.io.parser.BListParser;
 import bencode.io.parser.BStringParser;
 import bencode.io.parser.BValueParser;
-import bencode.io.parser.IBValueParser;
 import bencode.values.BDictionary;
 import bencode.values.BInteger;
 import bencode.values.BList;
@@ -24,7 +23,7 @@ public final class BValueParsers {
 
 	private final Charset charset;
 
-	private final Map<Class<?>, IBValueParser<?>> knownParsers = new HashMap<>();
+	private final Map<Class<?>, ?> knownParsers = new HashMap<>();
 
 	public BValueParsers() {
 		this.charset = Charset.defaultCharset();
@@ -44,7 +43,7 @@ public final class BValueParsers {
 		this.register(BDictionaryParser.class);
 	}
 
-	private void register(Class<? extends IBValueParser<?>> cls) {
+	private void register(Class<?> cls) {
 		try {
 			cls.getDeclaredConstructor(BValueParsers.class).newInstance(this);
 		} catch (Exception e) {
@@ -53,7 +52,7 @@ public final class BValueParsers {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends IBValueParser<?>> T get(@NonNull Class<T> cls) {
+	private <T> T get(@NonNull Class<T> cls) {
 		return (T) this.knownParsers.get(cls);
 	}
 
@@ -79,7 +78,8 @@ public final class BValueParsers {
 
 	/* write methods */
 
-	public <T extends IBValueParser<V>, V extends BValue<?>> byte[] _write(Class<T> cls, V value) throws IOException {
+	public <T extends BValueSerializer<V>, V extends BValue<?>> byte[] _write(Class<T> cls, V value)
+			throws IOException {
 		try (BEncodeOutputStream stream = new BEncodeOutputStream(this.charset)) {
 			this.get(cls).serialize(stream, value);
 			return stream.array();
@@ -128,7 +128,8 @@ public final class BValueParsers {
 
 	/* read methods */
 
-	private <T extends IBValueParser<V>, V extends BValue<?>> V _read(Class<T> cls, byte[] bytes) throws IOException {
+	private <T extends BValueDeserializer<V>, V extends BValue<?>> V _read(Class<T> cls, byte[] bytes)
+			throws IOException {
 		try (BEncodeInputStream stream = new BEncodeInputStream(bytes)) {
 			return this.get(cls).deserialize(stream);
 		}

@@ -4,7 +4,9 @@ import java.io.IOException;
 
 import bencode.io.BEncodeInputStream;
 import bencode.io.BEncodeOutputStream;
+import bencode.io.BValueDeserializer;
 import bencode.io.BValueParsers;
+import bencode.io.BValueSerializer;
 import bencode.values.BDictionary;
 import bencode.values.BInteger;
 import bencode.values.BList;
@@ -14,7 +16,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public final class BValueParser implements IBValueParser<BValue<?>> {
+public final class BValueParser implements BValueSerializer<BValue<?>>, BValueDeserializer<BValue<?>> {
 
 	private final BValueParsers parsers;
 

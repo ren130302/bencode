@@ -4,13 +4,15 @@ import java.io.IOException;
 
 import bencode.io.BEncodeInputStream;
 import bencode.io.BEncodeOutputStream;
+import bencode.io.BValueDeserializer;
 import bencode.io.BValueParsers;
+import bencode.io.BValueSerializer;
 import bencode.values.BInteger;
 import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public final class BIntegerParser implements IBValueParser<BInteger> {
+public final class BIntegerParser implements BValueSerializer<BInteger>, BValueDeserializer<BInteger> {
 
 	private final BValueParsers parsers;
 

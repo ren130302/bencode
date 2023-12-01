@@ -4,14 +4,16 @@ import java.io.IOException;
 
 import bencode.io.BEncodeInputStream;
 import bencode.io.BEncodeOutputStream;
+import bencode.io.BValueDeserializer;
 import bencode.io.BValueParsers;
+import bencode.io.BValueSerializer;
 import bencode.values.BList;
 import bencode.values.BValue;
 import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public final class BListParser implements IBValueParser<BList<?>> {
+public final class BListParser implements BValueSerializer<BList<?>>, BValueDeserializer<BList<?>> {
 
 	private final BValueParsers parsers;
 

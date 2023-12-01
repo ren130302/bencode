@@ -5,7 +5,9 @@ import java.util.Map.Entry;
 
 import bencode.io.BEncodeInputStream;
 import bencode.io.BEncodeOutputStream;
+import bencode.io.BValueDeserializer;
 import bencode.io.BValueParsers;
+import bencode.io.BValueSerializer;
 import bencode.values.BDictionary;
 import bencode.values.BString;
 import bencode.values.BValue;
@@ -13,7 +15,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public final class BDictionaryParser implements IBValueParser<BDictionary> {
+public final class BDictionaryParser implements BValueSerializer<BDictionary>, BValueDeserializer<BDictionary> {
 
 	private final BValueParsers parsers;
 
