@@ -11,7 +11,6 @@ import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.PushbackInputStream;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,17 +29,11 @@ import lombok.NonNull;
 public final class BEncodeInputStream implements Closeable {
 
 	private final PushbackInputStream _stream;
-	private final Charset _charset;
 
 	private final Map<Class<? extends BValueDeserializer<?>>, BValueDeserializer<?>> knownDeserializer = new HashMap<>();
 
 	public BEncodeInputStream(byte[] bytes) {
-		this(bytes, Charset.defaultCharset());
-	}
-
-	public BEncodeInputStream(byte[] bytes, Charset charset) {
 		this._stream = new PushbackInputStream(new ByteArrayInputStream(bytes));
-		this._charset = charset;
 		this.init();
 	}
 
