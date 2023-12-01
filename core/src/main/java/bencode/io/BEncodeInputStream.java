@@ -11,71 +11,116 @@ import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.PushbackInputStream;
-import java.util.HashMap;
-import java.util.Map;
 
-import bencode.io.parser.BDictionaryParser;
-import bencode.io.parser.BIntegerParser;
-import bencode.io.parser.BListParser;
-import bencode.io.parser.BStringParser;
-import bencode.io.parser.BValueParser;
 import bencode.values.BDictionary;
 import bencode.values.BInteger;
 import bencode.values.BList;
 import bencode.values.BString;
 import bencode.values.BValue;
-import lombok.NonNull;
 
 public final class BEncodeInputStream implements Closeable {
 
 	private final PushbackInputStream _stream;
 
-	private final Map<Class<? extends BValueDeserializer<?>>, BValueDeserializer<?>> knownDeserializer = new HashMap<>();
-
 	public BEncodeInputStream(byte[] bytes) {
 		this._stream = new PushbackInputStream(new ByteArrayInputStream(bytes));
-		this.init();
-	}
-
-	private void init() {
-		this.register(BValueParser.class);
-		this.register(BStringParser.class);
-		this.register(BIntegerParser.class);
-		this.register(BListParser.class);
-		this.register(BDictionaryParser.class);
-	}
-
-	private void register(Class<? extends BValueDeserializer<?>> cls) {
-		try {
-			this.knownDeserializer.put(cls, cls.getDeclaredConstructor().newInstance());
-		} catch (Exception e) {
-			throw new IllegalArgumentException(cls.getSimpleName(), e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private <T extends BValueSerializer<?>> T get(@NonNull Class<T> cls) {
-		return (T) this.knownDeserializer.get(cls);
 	}
 
 	public BValue<?> deserializeBValue() throws IOException {
-		return this.get(BValueParser.class).deserialize(this);
+		if (Character.isDigit(this.unread())) {
+			return this.deserializeBString();
+		}
+		if (this.isIntCode(this.unread())) {
+			return this.deserializeBInteger();
+		}
+		if (this.isListCode(this.unread())) {
+			return this.deserializeBList();
+		}
+		if (this.isDictCode(this.unread())) {
+			return this.deserializeBDictionary();
+		}
+
+		throw this.unknownStartCode();
 	}
 
 	public BDictionary deserializeBDictionary() throws IOException {
-		return this.get(BDictionaryParser.class).deserialize(this);
+		this.checkDictCode();
+
+		final BDictionary result = BDictionary.create();
+
+		BString key = null;
+		BValue<?> value = null;
+
+		while (this.hasRemaining()) {
+			if (this.isEndCode()) {
+				this.read();
+				break;
+			}
+
+			key = this.deserializeBString();
+			value = this.deserializeBValue();
+			result.put(key, value);
+		}
+
+		return result;
 	}
 
 	public BList<?> deserializeBList() throws IOException {
-		return this.get(BListParser.class).deserialize(this);
+		this.checkListCode();
+
+		final BList<BValue<?>> result = BList.create();
+
+		BValue<?> value = null;
+
+		while (this.hasRemaining()) {
+			if (this.isEndCode()) {
+				this.read();
+				break;
+			}
+			value = this.deserializeBValue();
+			result.add(value);
+		}
+
+		return result;
 	}
 
 	public BInteger deserializeBInteger() throws IOException {
-		return this.get(BIntegerParser.class).deserialize(this);
+		this.checkIntCode();
+
+		StringBuffer strBuf = new StringBuffer();
+
+		while (this.hasRemaining()) {
+			if (this.isEndCode()) {
+				this.read();
+				break;
+			}
+
+			int c = this.read();
+			if (Character.isDigit(c) || this.isNegaCode(c)) {
+				strBuf.append((char) c);
+			}
+		}
+
+		return BInteger.valueOf(Long.parseLong(strBuf.toString()));
 	}
 
 	public BString deserializeBString() throws IOException {
-		return this.get(BStringParser.class).deserialize(this);
+		StringBuffer strBuf = new StringBuffer();
+
+		int c = this.read();
+
+		while (this.hasRemaining()) {
+			if (this.isCoronCode(c)) {
+				break;
+			}
+			if (Character.isDigit(c)) {
+				strBuf.append((char) c);
+			}
+			c = this.read();
+		}
+
+		int length = Integer.parseInt(strBuf.toString());
+		return BString.valueOf(this.readBytes(length));
 	}
 
 	@Override

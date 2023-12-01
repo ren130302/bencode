@@ -11,27 +11,18 @@ import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Map.Entry;
 
-import bencode.io.parser.BDictionaryParser;
-import bencode.io.parser.BIntegerParser;
-import bencode.io.parser.BListParser;
-import bencode.io.parser.BStringParser;
-import bencode.io.parser.BValueParser;
 import bencode.values.BDictionary;
 import bencode.values.BInteger;
 import bencode.values.BList;
 import bencode.values.BString;
 import bencode.values.BValue;
-import lombok.NonNull;
 
 public final class BEncodeOutputStream implements Closeable, Flushable {
 
 	private final ByteArrayOutputStream _stream;
 	private final Charset _charset;
-
-	private final Map<Class<? extends BValueDeserializer<?>>, BValueDeserializer<?>> knownSerializer = new HashMap<>();
 
 	public BEncodeOutputStream() {
 		this(Charset.defaultCharset());
@@ -40,48 +31,61 @@ public final class BEncodeOutputStream implements Closeable, Flushable {
 	public BEncodeOutputStream(Charset charset) {
 		this._stream = new ByteArrayOutputStream();
 		this._charset = charset;
-		this.init();
-	}
 
-	private void init() {
-		this.register(BValueParser.class);
-		this.register(BStringParser.class);
-		this.register(BIntegerParser.class);
-		this.register(BListParser.class);
-		this.register(BDictionaryParser.class);
-	}
-
-	private void register(Class<? extends BValueDeserializer<?>> cls) {
-		try {
-			this.knownSerializer.put(cls, cls.getDeclaredConstructor().newInstance());
-		} catch (Exception e) {
-			throw new IllegalArgumentException(cls.getSimpleName(), e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private <T extends BValueDeserializer<?>> T get(@NonNull Class<T> cls) {
-		return (T) this.knownSerializer.get(cls);
 	}
 
 	public void serializeBValue(BValue<?> value) throws IOException {
-		this.get(BValueParser.class).serialize(this, value);
+		if (value instanceof BString v) {
+			this.serializeBString(v);
+			return;
+		}
+		if (value instanceof BInteger v) {
+			this.serializeBInteger(v);
+			return;
+		}
+		if (value instanceof BList v) {
+			this.serializeBList(v);
+			return;
+		}
+		if (value instanceof BDictionary v) {
+			this.serializeBDictionary(v);
+			return;
+		}
+
+		throw this.unknownBEncodeType(value.getClass());
 	}
 
 	public void serializeBDictionary(BDictionary value) throws IOException {
-		this.get(BDictionaryParser.class).serialize(this, value);
+		this.writeDictCode();
+
+		for (Entry<BString, BValue<?>> entry : value.entrySet()) {
+			this.serializeBString(entry.getKey());
+			this.serializeBValue(entry.getValue());
+		}
+
+		this.writeEndCode();
 	}
 
 	public void serializeBList(BList<?> value) throws IOException {
-		this.get(BListParser.class).serialize(this, value);
+		this.writeListCode();
+
+		for (BValue<?> v : value.getValue()) {
+			this.serializeBValue(v);
+		}
+
+		this.writeEndCode();
 	}
 
 	public void serializeBInteger(BInteger value) throws IOException {
-		this.get(BIntegerParser.class).serialize(this, value);
+		this.writeIntCode();
+		this.writeLong(value.longValue());
+		this.writeEndCode();
 	}
 
 	public void serializeBString(BString value) throws IOException {
-		this.get(BStringParser.class).serialize(this, value);
+		this.writeLong(value.getValue().length);
+		this.writeCoronCode();
+		this.writeBytes(value.getBytes());
 	}
 
 	@Override
@@ -94,7 +98,7 @@ public final class BEncodeOutputStream implements Closeable, Flushable {
 		this._stream.close();
 	}
 
-	public byte[] array() {
+	public byte[] toBytes() {
 		return this._stream.toByteArray();
 	}
 

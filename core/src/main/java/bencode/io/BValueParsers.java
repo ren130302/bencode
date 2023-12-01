@@ -26,7 +26,7 @@ public final class BValueParsers {
 	public byte[] writeBDictionaryToBytes(BDictionary value) throws IOException {
 		try (BEncodeOutputStream stream = new BEncodeOutputStream(this._charset)) {
 			stream.serializeBDictionary(value);
-			return stream.array();
+			return stream.toBytes();
 		}
 	}
 
@@ -37,7 +37,7 @@ public final class BValueParsers {
 	public byte[] writeBListToBytes(BList<?> value) throws IOException {
 		try (BEncodeOutputStream stream = new BEncodeOutputStream(this._charset)) {
 			stream.serializeBList(value);
-			return stream.array();
+			return stream.toBytes();
 		}
 	}
 
@@ -48,7 +48,7 @@ public final class BValueParsers {
 	public byte[] writeBIntegerToBytes(BInteger value) throws IOException {
 		try (BEncodeOutputStream stream = new BEncodeOutputStream(this._charset)) {
 			stream.serializeBInteger(value);
-			return stream.array();
+			return stream.toBytes();
 		}
 	}
 
@@ -59,7 +59,7 @@ public final class BValueParsers {
 	public byte[] writeBStringToBytes(BString value) throws IOException {
 		try (BEncodeOutputStream stream = new BEncodeOutputStream(this._charset)) {
 			stream.serializeBString(value);
-			return stream.array();
+			return stream.toBytes();
 		}
 	}
 
@@ -70,7 +70,7 @@ public final class BValueParsers {
 	public byte[] writeBValueToBytes(BValue<?> value) throws IOException {
 		try (BEncodeOutputStream stream = new BEncodeOutputStream(this._charset)) {
 			stream.serializeBValue(value);
-			return stream.array();
+			return stream.toBytes();
 		}
 	}
 
