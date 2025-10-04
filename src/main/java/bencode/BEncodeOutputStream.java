@@ -1,7 +1,7 @@
 package bencode;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public final class BEncodeOutputStream {
@@ -28,37 +28,35 @@ public final class BEncodeOutputStream {
     this.buffer.put(b);
   }
 
-  public void writeBBytes(BBytes value) throws IOException {
+  public void writeBBytes(BBytes value) {
     byte[] bytes = value.getValue();
     this.writeLongDirect(bytes.length);
     this.writeByte(BEncodeConstants.CORON);
     this.writeBytes(bytes);
   }
 
-  public void writeBInt(BInteger value) throws IOException {
+  public void writeBInt(BInteger value) {
     this.writeByte(BEncodeConstants.INTEGER);
     this.writeLongDirect(value.getValue());
     this.writeByte(BEncodeConstants.END);
   }
 
-  public void writeBList(BList<?> list) throws IOException {
+  public void writeBList(BList<?> list) {
     this.writeByte(BEncodeConstants.LIST);
-    for (BValue<?> v : list.getValue()) {
-      this.writeBValue(v);
-    }
+    list.getValue().forEach(this::writeBValue);
     this.writeByte(BEncodeConstants.END);
   }
 
-  public void writeBDict(BDictionary dict) throws IOException {
+  public void writeBDict(BDictionary dict) {
     this.writeByte(BEncodeConstants.DICTIONARY);
-    for (Map.Entry<BBytes, BValue<?>> e : dict.getValue().entrySet()) {
+    dict.getValue().entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(e -> {
       this.writeBBytes(e.getKey());
       this.writeBValue(e.getValue());
-    }
+    });
     this.writeByte(BEncodeConstants.END);
   }
 
-  public void writeBValue(BValue<?> value) throws IOException {
+  public void writeBValue(BValue<?> value) {
     if (value instanceof BBytes v) {
       this.writeBBytes(v);
     } else if (value instanceof BInteger v) {
@@ -76,32 +74,9 @@ public final class BEncodeOutputStream {
   }
 
   private void writeLongDirect(long value) {
-    if (value == 0) {
-      this.writeByte((byte) '0');
-      return;
-    }
-    boolean negative = value < 0;
-    long n = negative ? -value : value;
-    int len = 0;
-    long t = n;
-    while (t > 0) {
-      t /= 10;
-      len++;
-    }
-    if (negative) {
-      len++;
-    }
-    this.ensureCapacity(len);
-    int pos = this.buffer.position() + len - 1;
-    while (n > 0) {
-      this.buffer.put(pos--, (byte) ('0' + n % 10));
-      n /= 10;
-    }
-    if (negative) {
-      this.buffer.put(this.buffer.position(), (byte) '-');
-    }
-    this.buffer.position(this.buffer.position() + len);
+    this.writeBytes(Long.toString(value).getBytes(StandardCharsets.US_ASCII));
   }
+
 
   public byte[] toByteArray() {
     ByteBuffer copy = this.buffer.duplicate();

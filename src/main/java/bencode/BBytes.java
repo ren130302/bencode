@@ -4,7 +4,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public final class BBytes implements BValue<byte[]> {
+public final class BBytes implements BValue<byte[]>, Comparable<BBytes> {
   private final byte[] value;
   private final int hash;
 
@@ -18,7 +18,7 @@ public final class BBytes implements BValue<byte[]> {
   }
 
   public static BBytes valueOf(String s) {
-    return new BBytes(s.getBytes());
+    return new BBytes(s.getBytes(StandardCharsets.US_ASCII));
   }
 
   public static BBytes valueOf(String s, Charset charset) {
@@ -59,4 +59,15 @@ public final class BBytes implements BValue<byte[]> {
     return this.toString(StandardCharsets.UTF_8);
   }
 
+  @Override
+  public int compareTo(BBytes o) {
+    int len = Math.min(this.value.length, o.value.length);
+    for (int i = 0; i < len; i++) {
+      int diff = (this.value[i] & 0xFF) - (o.value[i] & 0xFF);
+      if (diff != 0) {
+        return diff;
+      }
+    }
+    return this.value.length - o.value.length;
+  }
 }

@@ -1,8 +1,8 @@
 package bencode;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 
 public final class BDictionary implements BValue<Map<BBytes, BValue<?>>> {
 
@@ -49,7 +49,7 @@ public final class BDictionary implements BValue<Map<BBytes, BValue<?>>> {
   }
 
   public static final class Builder {
-    private final Map<BBytes, BValue<?>> buffer = new LinkedHashMap<>();
+    private final Map<BBytes, BValue<?>> buffer = new TreeMap<>(BBytes::compareTo);
 
     public Builder put(String key, BValue<?> value) {
       this.buffer.put(BBytes.valueOf(key), Objects.requireNonNull(value));
@@ -65,7 +65,7 @@ public final class BDictionary implements BValue<Map<BBytes, BValue<?>>> {
       if (this.buffer.isEmpty()) {
         return EMPTY;
       }
-      return new BDictionary(this.buffer);
+      return new BDictionary(new TreeMap<>(this.buffer));
     }
   }
 }

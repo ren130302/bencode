@@ -4,41 +4,56 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class BEncodeTest {
 
+  // ---------------- BBytes ----------------
   @Test
-  void testBBytes() throws IOException {
+  void testBBytesWriteAndRead() throws IOException {
     BBytes original = BBytes.valueOf("hello");
     BEncodeOutputStream out = new BEncodeOutputStream();
     out.writeBBytes(original);
 
+    // 書き込み直後の形式確認
+    String written = new String(out.toByteArray(), StandardCharsets.US_ASCII);
+    assertEquals("5:hello", written);
+
+    // 読み込み確認
     BBytes deserialized = new BEncodeInputStream(out.toByteArray()).readBBytes();
     assertArrayEquals(original.getValue(), deserialized.getValue());
     assertEquals(original, deserialized);
   }
 
+  // ---------------- BInteger ----------------
   @Test
-  void testBInteger() throws IOException {
+  void testBIntegerWriteAndRead() throws IOException {
     BInteger original = BInteger.valueOf(12345);
     BEncodeOutputStream out = new BEncodeOutputStream();
     out.writeBInt(original);
+
+    String written = new String(out.toByteArray(), StandardCharsets.US_ASCII);
+    assertEquals("i12345e", written);
 
     BInteger deserialized = new BEncodeInputStream(out.toByteArray()).readBInteger();
     assertEquals(original.getValue(), deserialized.getValue());
     assertEquals(original, deserialized);
   }
 
+  // ---------------- 空のリストと辞書 ----------------
   @Test
-  void testEmptyBListAndBDict() throws IOException {
+  void testEmptyBListAndBDictWriteAndRead() throws IOException {
     BList<BValue<?>> emptyList = BList.<BValue<?>>builder().build();
     BDictionary emptyDict = BDictionary.builder().build();
 
     BEncodeOutputStream out = new BEncodeOutputStream();
     out.writeBList(emptyList);
     out.writeBDict(emptyDict);
+
+    String written = new String(out.toByteArray(), StandardCharsets.US_ASCII);
+    assertEquals("le" + "de", written); // 空リスト: "le", 空辞書: "de"
 
     BEncodeInputStream in = new BEncodeInputStream(out.toByteArray());
     BList<?> deserializedList = in.readBList();
@@ -48,20 +63,25 @@ class BEncodeTest {
     assertEquals(emptyDict, deserializedDict);
   }
 
+  // ---------------- BList ----------------
   @Test
-  void testBList() throws IOException {
+  void testBListWriteAndRead() throws IOException {
     BList<BValue<?>> original =
         BList.<BValue<?>>builder().add(BBytes.valueOf("a")).add(BInteger.valueOf(42)).build();
 
     BEncodeOutputStream out = new BEncodeOutputStream();
     out.writeBList(original);
 
+    String written = new String(out.toByteArray(), StandardCharsets.US_ASCII);
+    assertEquals("l1:ai42ee", written); // "l<elem1><elem2>e"
+
     BList<?> deserialized = new BEncodeInputStream(out.toByteArray()).readBList();
     assertEquals(original, deserialized);
   }
 
+  // ---------------- BDictionary ----------------
   @Test
-  void testBDictionary() throws IOException {
+  void testBDictionaryWriteAndRead() throws IOException {
     BDictionary original = BDictionary.builder().put("key1", BBytes.valueOf("value1"))
         .put("key2", BInteger.valueOf(99))
         .put("key3",
@@ -87,8 +107,9 @@ class BEncodeTest {
     assertEquals(original, deserialized);
   }
 
+  // ---------------- ネスト構造 ----------------
   @Test
-  void testNestedStructures() throws IOException {
+  void testNestedStructuresWriteAndRead() throws IOException {
     BDictionary nested = BDictionary.builder()
         .put("list",
             BList.<BValue<?>>builder().add(BInteger.valueOf(1)).add(BInteger.valueOf(2))
@@ -104,8 +125,9 @@ class BEncodeTest {
     assertEquals(nested, deserialized);
   }
 
+  // ---------------- 深いネスト構造 ----------------
   @Test
-  void testDeeplyNestedStructure() throws IOException {
+  void testDeeplyNestedStructureWriteAndRead() throws IOException {
     BDictionary nestedDict = BDictionary.builder().put("level1_dict", BDictionary.builder().put(
         "level2_list",
         BList.<BValue<?>>builder().add(BBytes.valueOf("alpha")).add(BInteger.valueOf(123))

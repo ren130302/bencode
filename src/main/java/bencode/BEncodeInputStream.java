@@ -1,14 +1,17 @@
 package bencode;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
+/**
+ * BEncode 入力ストリーム（RuntimeException版・修正版）
+ */
 public final class BEncodeInputStream {
 
   private final ByteBuffer buffer;
 
   public BEncodeInputStream(byte[] bytes) {
-    this.buffer = ByteBuffer.wrap(bytes);
+    this.buffer = ByteBuffer.wrap(Objects.requireNonNull(bytes, "bytes must not be null"));
   }
 
   public boolean hasRemaining() {
@@ -23,115 +26,170 @@ public final class BEncodeInputStream {
     return this.hasRemaining() ? (this.buffer.get(this.buffer.position()) & 0xFF) : -1;
   }
 
-  public void unread() throws IOException {
+  public void unread() {
     if (this.buffer.position() == 0) {
-      throw new IOException("Cannot unread at position 0");
+      throw new IllegalStateException("Cannot unread at position 0");
     }
     this.buffer.position(this.buffer.position() - 1);
   }
 
-  public byte[] readBytes(int length) throws IOException {
-    if (this.buffer.remaining() < length) {
-      throw new IOException("Unexpected EOF");
+  @FunctionalInterface
+  public interface BReader<E> {
+    E read(BEncodeInputStream in);
+  }
+
+  // -------------------- BValue 読み取り --------------------
+
+
+  public BValue<?> readBValue() {
+    int c = this.peek();
+    if (c == -1) {
+      throw new IllegalStateException("Unexpected EOF while reading BValue");
     }
-    byte[] dst = new byte[length];
+
+    return switch (c) {
+      case BEncodeConstants.INTEGER -> this.readBInteger();
+      case BEncodeConstants.LIST -> this.readBList(BEncodeInputStream::readBValue);
+      case BEncodeConstants.DICTIONARY -> this.readBDict();
+      default -> {
+        if ((c < '0') || (c > '9')) {
+          throw new IllegalArgumentException("Unknown BEncode type: '" + (char) c + "'");
+        }
+        yield this.readBBytes();
+      }
+    };
+  }
+
+
+  // -------------------- バイト列 --------------------
+
+  public BBytes readBBytes() {
+    long length = this.readDecimalNumber(); // ここで数字を読み、':' も消費する
+    return BBytes.valueOf(this.readBytesExact(length));
+  }
+
+
+  private byte[] readBytesExact(long length) {
+    if (length > Integer.MAX_VALUE) {
+      throw new IllegalArgumentException("Byte length too large: " + length);
+    }
+    int len = (int) length;
+    if (this.buffer.remaining() < len) {
+      throw new IllegalStateException("Unexpected EOF while reading " + len + " bytes");
+    }
+    byte[] dst = new byte[len];
     this.buffer.get(dst);
     return dst;
   }
 
-  public BBytes readBBytes() throws IOException {
-    // length parsing
-    int length = 0;
-    int c;
-    while ((c = this.read()) != -1) {
-      if (c == BEncodeConstants.CORON) {
-        break;
-      }
-      length = length * 10 + (c - '0');
-      if (length < 0) {
-        throw new IOException("Byte length overflow");
-      }
-    }
-    if (c != BEncodeConstants.CORON) {
-      throw new IOException("Expected ':' after length");
-    }
-    return BBytes.valueOf(this.readBytes(length));
-  }
+  // -------------------- 整数 --------------------
 
-  public BInteger readBInteger() throws IOException {
-    if (this.read() != BEncodeConstants.INTEGER) {
-      throw new IOException("Expected 'i'");
-    }
-    long value = 0;
+  public BInteger readBInteger() {
+    this.expectChar(BEncodeConstants.INTEGER, "'i' expected at start of integer");
+
     boolean negative = false;
     int c = this.read();
     if (c == '-') {
       negative = true;
       c = this.read();
+      if (c == '0') {
+        throw new IllegalArgumentException("Negative zero not allowed");
+      }
     }
+
     if (c < '0' || c > '9') {
-      throw new IOException("Invalid integer");
+      throw new IllegalArgumentException("Invalid integer format");
     }
-    value = c - '0';
+
+    long value = c - '0';
     while ((c = this.read()) != BEncodeConstants.END) {
       if (c < '0' || c > '9') {
-        throw new IOException("Invalid integer digit");
+        throw new IllegalArgumentException("Invalid integer format");
       }
       value = value * 10 + (c - '0');
+      if (value < 0) {
+        throw new IllegalArgumentException("Integer overflow");
+      }
     }
     return BInteger.valueOf(negative ? -value : value);
   }
 
-  @SuppressWarnings("unchecked")
-  public <E extends BValue<?>> BList<E> readBList() throws IOException {
-    if (this.read() != BEncodeConstants.LIST) {
-      throw new IOException("Expected 'l'");
-    }
+  // -------------------- リスト --------------------
+
+  public <E extends BValue<?>> BList<E> readBList(BReader<E> elementReader) {
+    this.expectChar(BEncodeConstants.LIST, "'l' expected at start of list");
     BList.Builder<E> builder = BList.builder();
-    while (true) {
-      int c = this.peek();
-      if (c == BEncodeConstants.END) {
-        this.read();
-        break;
+    int c;
+    while ((c = this.peek()) != BEncodeConstants.END) {
+      if (c == -1) {
+        throw new IllegalStateException("Unexpected EOF while reading list");
       }
-      builder.add((E) this.readBValue());
+      builder.add(elementReader.read(this));
     }
+    this.read(); // consume 'e'
     return builder.build();
   }
 
-  public BDictionary readBDict() throws IOException {
-    if (this.read() != BEncodeConstants.DICTIONARY) {
-      throw new IOException("Expected 'd'");
-    }
+  public BList<?> readBList() {
+    return this.readBList(BEncodeInputStream::readBValue);
+  }
+
+  // -------------------- 辞書 --------------------
+
+  public BDictionary readBDict() {
+    this.expectChar(BEncodeConstants.DICTIONARY, "'d' expected at start of dictionary");
     BDictionary.Builder builder = BDictionary.builder();
-    while (true) {
-      int c = this.peek();
-      if (c == BEncodeConstants.END) {
-        this.read();
-        break;
+    BBytes previousKey = null;
+
+    int c;
+    while ((c = this.peek()) != BEncodeConstants.END) {
+      if (c == -1) {
+        throw new IllegalStateException("Unexpected EOF while reading dictionary");
       }
+
       BBytes key = this.readBBytes();
+
+      if (previousKey != null && previousKey.compareTo(key) >= 0) {
+        throw new IllegalArgumentException("Dictionary keys not in sorted order");
+      }
+
+      previousKey = key;
+
       BValue<?> value = this.readBValue();
       builder.put(key, value);
     }
+    this.read(); // consume 'e'
     return builder.build();
   }
 
-  public BValue<?> readBValue() throws IOException {
-    int c = this.peek();
-    if (c >= '0' && c <= '9') {
-      return this.readBBytes();
+  // -------------------- ヘルパーメソッド --------------------
+
+  private long readDecimalNumber() {
+    long result = 0;
+    int c = this.read();
+    if (c < '0' || c > '9') {
+      throw new IllegalArgumentException(
+          "Expected digit while reading number, got: '" + (char) c + "'");
     }
-    switch (c) {
-      case BEncodeConstants.INTEGER:
-        return this.readBInteger();
-      case BEncodeConstants.LIST:
-        return this.readBList();
-      case BEncodeConstants.DICTIONARY:
-        return this.readBDict();
-      default:
-        break;
+    do {
+      result = result * 10 + (c - '0');
+      if (result < 0) {
+        throw new IllegalArgumentException("Byte length overflow detected");
+      }
+      c = this.read();
+    } while (c >= '0' && c <= '9');
+
+    if (c != BEncodeConstants.CORON) {
+      throw new IllegalArgumentException("':' expected after number, but got: '" + (char) c + "'");
     }
-    throw new IOException("Unknown BEncode type: '" + (char) c + "'");
+    return result;
   }
+
+  private void expectChar(int expected, String message) {
+    int c = this.read();
+    if (c != expected) {
+      throw new IllegalArgumentException(message + ", but got: '" + (char) c + "'");
+    }
+  }
+
 }
