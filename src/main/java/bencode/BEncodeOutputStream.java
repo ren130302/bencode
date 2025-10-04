@@ -7,10 +7,9 @@ import java.util.Map;
 public final class BEncodeOutputStream {
 
   private ByteBuffer buffer;
-  private static final int DEFAULT_CAPACITY = 1024;
 
   public BEncodeOutputStream() {
-    this.buffer = ByteBuffer.allocate(DEFAULT_CAPACITY);
+    this.buffer = ByteBuffer.allocate(1024);
   }
 
   private void ensureCapacity(int additional) {
