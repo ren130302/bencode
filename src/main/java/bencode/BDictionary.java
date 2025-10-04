@@ -65,7 +65,7 @@ public final class BDictionary implements BValue<Map<BBytes, BValue<?>>> {
       if (this.buffer.isEmpty()) {
         return EMPTY;
       }
-      return new BDictionary(new TreeMap<>(this.buffer));
+      return new BDictionary(this.buffer);
     }
   }
 }
