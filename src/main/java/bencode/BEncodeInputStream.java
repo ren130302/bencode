@@ -3,9 +3,6 @@ package bencode;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 
-/**
- * BEncode 入力ストリーム（RuntimeException版・修正版）
- */
 public final class BEncodeInputStream {
 
   private final ByteBuffer buffer;
@@ -38,9 +35,6 @@ public final class BEncodeInputStream {
     E read(BEncodeInputStream in);
   }
 
-  // -------------------- BValue 読み取り --------------------
-
-
   public BValue<?> readBValue() {
     int c = this.peek();
     if (c == -1) {
@@ -60,11 +54,8 @@ public final class BEncodeInputStream {
     };
   }
 
-
-  // -------------------- バイト列 --------------------
-
   public BBytes readBBytes() {
-    long length = this.readDecimalNumber(); // ここで数字を読み、':' も消費する
+    long length = this.readDecimalNumber();
     return BBytes.valueOf(this.readBytesExact(length));
   }
 
@@ -81,8 +72,6 @@ public final class BEncodeInputStream {
     this.buffer.get(dst);
     return dst;
   }
-
-  // -------------------- 整数 --------------------
 
   public BInteger readBInteger() {
     this.expectChar(BEncodeConstants.INTEGER, "'i' expected at start of integer");
@@ -114,8 +103,6 @@ public final class BEncodeInputStream {
     return BInteger.valueOf(negative ? -value : value);
   }
 
-  // -------------------- リスト --------------------
-
   public <E extends BValue<?>> BList<E> readBList(BReader<E> elementReader) {
     this.expectChar(BEncodeConstants.LIST, "'l' expected at start of list");
     BList.Builder<E> builder = BList.builder();
@@ -133,8 +120,6 @@ public final class BEncodeInputStream {
   public BList<?> readBList() {
     return this.readBList(BEncodeInputStream::readBValue);
   }
-
-  // -------------------- 辞書 --------------------
 
   public BDictionary readBDict() {
     this.expectChar(BEncodeConstants.DICTIONARY, "'d' expected at start of dictionary");
@@ -161,8 +146,6 @@ public final class BEncodeInputStream {
     this.read(); // consume 'e'
     return builder.build();
   }
-
-  // -------------------- ヘルパーメソッド --------------------
 
   private long readDecimalNumber() {
     long result = 0;
