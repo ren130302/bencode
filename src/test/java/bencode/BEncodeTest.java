@@ -15,9 +15,7 @@ class BEncodeTest {
     BEncodeOutputStream out = new BEncodeOutputStream();
     out.writeBBytes(original);
 
-    byte[] bytes = out.toByteArray();
-    BBytes deserialized = new BEncodeInputStream(bytes).readBBytes();
-
+    BBytes deserialized = new BEncodeInputStream(out.toByteArray()).readBBytes();
     assertArrayEquals(original.getValue(), deserialized.getValue());
     assertEquals(original, deserialized);
   }
@@ -28,11 +26,26 @@ class BEncodeTest {
     BEncodeOutputStream out = new BEncodeOutputStream();
     out.writeBInt(original);
 
-    byte[] bytes = out.toByteArray();
-    BInteger deserialized = new BEncodeInputStream(bytes).readBInteger();
-
+    BInteger deserialized = new BEncodeInputStream(out.toByteArray()).readBInteger();
     assertEquals(original.getValue(), deserialized.getValue());
     assertEquals(original, deserialized);
+  }
+
+  @Test
+  void testEmptyBListAndBDict() throws IOException {
+    BList<BValue<?>> emptyList = BList.<BValue<?>>builder().build();
+    BDictionary emptyDict = BDictionary.builder().build();
+
+    BEncodeOutputStream out = new BEncodeOutputStream();
+    out.writeBList(emptyList);
+    out.writeBDict(emptyDict);
+
+    BEncodeInputStream in = new BEncodeInputStream(out.toByteArray());
+    BList<?> deserializedList = in.readBList();
+    BDictionary deserializedDict = in.readBDict();
+
+    assertEquals(emptyList, deserializedList);
+    assertEquals(emptyDict, deserializedDict);
   }
 
   @Test
@@ -43,10 +56,7 @@ class BEncodeTest {
     BEncodeOutputStream out = new BEncodeOutputStream();
     out.writeBList(original);
 
-    byte[] bytes = out.toByteArray();
-    BList<?> deserialized = new BEncodeInputStream(bytes).readBList();
-
-    assertEquals(original.getValue().size(), deserialized.getValue().size());
+    BList<?> deserialized = new BEncodeInputStream(out.toByteArray()).readBList();
     assertEquals(original, deserialized);
   }
 
@@ -61,9 +71,7 @@ class BEncodeTest {
     BEncodeOutputStream out = new BEncodeOutputStream();
     out.writeBDict(original);
 
-    byte[] bytes = out.toByteArray();
-    BDictionary deserialized = new BEncodeInputStream(bytes).readBDict();
-
+    BDictionary deserialized = new BEncodeInputStream(out.toByteArray()).readBDict();
     assertEquals(original.getValue().size(), deserialized.getValue().size());
 
     for (Map.Entry<BBytes, BValue<?>> entry : original.getValue().entrySet()) {
@@ -92,9 +100,7 @@ class BEncodeTest {
     BEncodeOutputStream out = new BEncodeOutputStream();
     out.writeBDict(nested);
 
-    byte[] bytes = out.toByteArray();
-    BDictionary deserialized = new BEncodeInputStream(bytes).readBDict();
-
+    BDictionary deserialized = new BEncodeInputStream(out.toByteArray()).readBDict();
     assertEquals(nested, deserialized);
   }
 
@@ -115,12 +121,10 @@ class BEncodeTest {
     BEncodeOutputStream out = new BEncodeOutputStream();
     out.writeBDict(nestedDict);
 
-    byte[] bytes = out.toByteArray();
-    BDictionary deserialized = new BEncodeInputStream(bytes).readBDict();
-
+    BDictionary deserialized = new BEncodeInputStream(out.toByteArray()).readBDict();
     assertEquals(nestedDict, deserialized);
 
-    // ルートとネスト値の追加チェック
+    // 追加チェック
     BList<?> rootList =
         deserialized.getValue().get(BBytes.valueOf("root_list")) instanceof BList<?> l ? l : null;
     assertNotNull(rootList);

@@ -2,10 +2,10 @@ package bencode;
 
 public final class BInteger implements BValue<Long> {
 
-  private final Long value;
+  private final long value;
 
   private BInteger(long value) {
-    this.value = Long.valueOf(value);
+    this.value = value;
   }
 
   public static BInteger valueOf(long value) {
